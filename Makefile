@@ -1,7 +1,8 @@
 CASM = nasm
 CCPP = g++
 CC   = gcc
-CFLAGS   = -Wextra -g -m32 -std=c99
+# CFLAGS   = -Wextra -g -m32 -std=c99
+CFLAGS   = -Wextra -g -std=c99
 NFLAGS   = 
 INCLUDE  = 
 OBJDIR	 = objetos

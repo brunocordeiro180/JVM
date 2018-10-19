@@ -2,51 +2,51 @@
 #include "auxiliar.h"
 
 /*Verifica se o bit na posição id é 1*/
-int bit_is_true(int code, int id)
+int verifica_bit(int code, int id)
 {
     //Realiza o shift a esquerda do bit 0..01 em 'id' posições
     return code & (1 << id);
 }
 /*De acordo com tabela em https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.1-200-E.1*/
-void print_flags(int code, FILE* arq)
+void imprime_flags(int code, FILE* arq)
 {
 
     fprintf(arq, "[");
 
-    if (bit_is_true(code, 0))
+    if (verifica_bit(code, 0))
         fprintf(arq, "public ");
-    else if (bit_is_true(code, 1))
+    else if (verifica_bit(code, 1))
         fprintf(arq, "private ");
-    else if (bit_is_true(code, 2))
+    else if (verifica_bit(code, 2))
         fprintf(arq, "protected ");
-    if (bit_is_true(code, 3))
+    if (verifica_bit(code, 3))
         fprintf(arq, "static ");
-    if (bit_is_true(code, 4))
+    if (verifica_bit(code, 4))
         fprintf(arq, "final ");
-    if (bit_is_true(code, 5))
+    if (verifica_bit(code, 5))
         fprintf(arq, "super ");
-    if (bit_is_true(code, 6))
+    if (verifica_bit(code, 6))
         fprintf(arq, "volatile ");
-    if (bit_is_true(code, 7))
+    if (verifica_bit(code, 7))
         fprintf(arq, "transient ");
-    if (bit_is_true(code, 8))
+    if (verifica_bit(code, 8))
         fprintf(arq, "native ");
-    if (bit_is_true(code, 9))
+    if (verifica_bit(code, 9))
         fprintf(arq, "interface ");
-    if (bit_is_true(code, 10))
+    if (verifica_bit(code, 10))
         fprintf(arq, "abstract ");
 
     fprintf(arq, "]");
 }
 
 /*Print do CAFEBABE em hexa*/
-void print_func_magic(ClassFile* cf, FILE* arq)
+void imprime_magic_func(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "-- MAGIC: %x\n", cf->magic);
 }
 
 /*Imprime os valores lidos pela função load_versions em "leitor"*/
-void print_versions(ClassFile* cf, FILE* arq)
+void imprime_versions(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "-- MINOR VERSION: %d\n", cf->minor_version);
     char *version_jdk =  look_version(cf->major_version);
@@ -56,7 +56,7 @@ void print_versions(ClassFile* cf, FILE* arq)
     fprintf(arq, "-- CONSTANT POOL COUNT: %d\n", cf->constant_pool_count);
 
     fprintf(arq, "-- ACCESS_FLAGS: %x ", cf->access_flags);
-    print_flags(cf->access_flags, arq);
+    imprime_flags(cf->access_flags, arq);
     fprintf(arq, "\n");
     fprintf(arq, "-- THIS_CLASS: %d\n", cf->this_class);
     fprintf(arq, "-- SUPER_CLASS: %d\n", cf->super_class);
@@ -70,7 +70,7 @@ void print_versions(ClassFile* cf, FILE* arq)
 
 /*Imprime os valores referente a constant pool, as tags definidas na tabela
 foram definidos no exibidor.h */
-void print_constantpool(ClassFile* cf, FILE* arq)
+void imprime_pool_constantes(ClassFile* cf, FILE* arq)
 {
     int i = 1;
     long long Long;
@@ -142,13 +142,13 @@ void print_constantpool(ClassFile* cf, FILE* arq)
             break;
         }
     }
-
+ 
 }
 
-void print_classdata(ClassFile* cf, FILE* arq)
+void imprime_classdata(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "- ACCESS_FLAGS: %x ", cf->access_flags);
-    print_flags(cf->access_flags, arq);
+    imprime_flags(cf->access_flags, arq);
     fprintf(arq, "\n");
     fprintf(arq, "- THIS_CLASS: %d\n", cf->this_class);
     fprintf(arq, "\n");
@@ -291,7 +291,7 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
         cp_info* cp;
         for (code = att->type.Code_attribute.code; code < att->type.Code_attribute.code + att->type.Code_attribute.code_length; ++code)
         {
-            fprintf(arq, "\t\t%d | ", (int) (code - (att->type.Code_attribute.code))); //printa a instrucao sem o codigo em hexa
+            fprintf(arq, "\t\t%d | ", (int) (code - (att->type.Code_attribute.code))); //printa a instrucao sem o code em hexa
 
             fprintf(arq, "%s ", instruction_name[*code]); //printa a instrucao
             uint8_t u1_aux;
@@ -669,7 +669,7 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
             fprintf(arq, "\t--- OUTER CLASS: %d\n", classtype_aux->outer_class_info_index);
             fprintf(arq, "\t--- INNER NAME: %d\n", classtype_aux->inner_name_index);
             fprintf(arq, "\t--- INNER CLASS ACCESS FLAGS: %x ", classtype_aux->inner_class_access_flags);
-            print_flags(classtype_aux->inner_class_access_flags, arq);
+            imprime_flags(classtype_aux->inner_class_access_flags, arq);
             fprintf(arq, "\n\n");
             fprintf(arq, "\n");
         }
@@ -699,7 +699,7 @@ void print_fields(ClassFile* cf, FILE* arq)
         fprintf(arq, "\tNAME_INDEX: %d: %s\n", aux_field->name_index, (char*)cf->constant_pool[aux_field->name_index - 1].info.Utf8_info.bytes);
         fprintf(arq, "\tDESCRIPTOR_INDEX: %d: %s\n", aux_field->descriptor_index, (char*)cf->constant_pool[aux_field->descriptor_index - 1].info.Utf8_info.bytes);
         fprintf(arq, "\tACCESS_FLAGS: %x ", aux_field->access_flags);
-        print_flags(aux_field->access_flags, arq);
+        imprime_flags(aux_field->access_flags, arq);
         fprintf(arq, "\n");
         fprintf(arq, "\tATTRIBUTE_COUNT: %d\n\n", aux_field->attributes_count);
         attribute_info* aux_att;
@@ -730,7 +730,7 @@ void print_methodes(ClassFile* cf, FILE* arq)
         fprintf(arq, "--- NAME_INDEX: %d: %s\n", aux_meth->name_index, (char*)cf->constant_pool[aux_meth->name_index - 1].info.Utf8_info.bytes);
         fprintf(arq, "--- DESCRIPTOR_INDEX: %d: %s\n", aux_meth->descriptor_index, (char*)cf->constant_pool[aux_meth->descriptor_index - 1].info.Utf8_info.bytes);
         fprintf(arq, "--- ACCESS_FLAGS: %x ", aux_meth->access_flags);
-        print_flags(aux_meth->access_flags, arq);
+        imprime_flags(aux_meth->access_flags, arq);
         fprintf(arq, "\n");
         fprintf(arq, "--- ATTRIBUTE_COUNT: %d\n", aux_meth->attributes_count);
         attribute_info* aux_att;
@@ -766,11 +766,11 @@ void print(ClassFile* cf, char* filename_in, FILE* arq)
 {
     fprintf(arq, "Nome do arquivo: %s\n\n", filename_in);
     fprintf(arq, "\n");
-    print_func_magic(cf, arq);
+    imprime_magic_func(cf, arq);
     fprintf(arq, "\n");
-    print_versions(cf, arq);
+    imprime_versions(cf, arq);
     fprintf(arq, "\n");
-    print_constantpool(cf, arq);
+    imprime_pool_constantes(cf, arq);
     fprintf(arq, "\n");
     print_interfaces(cf, arq);
     fprintf(arq, "\n");

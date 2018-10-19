@@ -8,12 +8,14 @@
 #ifndef EXIBIDOR_H
 #define EXIBIDOR_H
 
-int bit_is_true(int code, int id);
-void print_flags(int code,FILE* arq);
+// Otto ------------------------------------------
+int verifica_bit(int code, int id);
+void imprime_flags(int code,FILE* arq);
 void print_func_magic(ClassFile* cf,FILE* arq);
-void print_versions(ClassFile* cf,FILE* arq);
-void print_constantpool(ClassFile* cf,FILE* arq);
-void print_classdata(ClassFile* cf,FILE* arq);
+void imprime_versions(ClassFile* cf,FILE* arq);
+void imprime_pool_constantes(ClassFile* cf,FILE* arq);
+void imprime_classdata(ClassFile* cf,FILE* arq);
+// -----------------------------------------------
 void print_interfaces(ClassFile* cf,FILE* arq);
 void print_atribute(ClassFile* cf, attribute_info* att,FILE* arq);
 void print_fields(ClassFile* cf,FILE* arq);
