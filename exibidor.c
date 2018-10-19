@@ -45,7 +45,7 @@ void print_func_magic(ClassFile* cf, FILE* arq)
     fprintf(arq, "-- MAGIC: %x\n", cf->magic);
 }
 
-/*Imprime os valores lidos pela função load_versions em "leitor"*/
+/*Imprime os valores lidos pela função carrega_versoes em "leitor"*/
 void print_versions(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "-- MINOR VERSION: %d\n", cf->minor_version);

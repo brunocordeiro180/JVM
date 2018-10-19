@@ -173,14 +173,13 @@ typedef struct
     attribute_info* attributes;
 } ClassFile;
 
-void load_magic(ClassFile* classfile,FILE* fd);
-void load_versions(ClassFile* classfile,FILE* fd);
-void load_constantpool(ClassFile* classfile,FILE* fd);
-void load_class(ClassFile* classfile,FILE* fd);
-void load_interfaces(ClassFile* classfile,FILE* fd);
-void load_constantvalue_attribute(attribute_info* att, FILE* fd);
-void load_code_attribute(attribute_info* att, ClassFile* classfile,FILE* fd);
-void load_exception_attribute(attribute_info* att,FILE* fd);
+void carrega_versoes(ClassFile* classfile,FILE* fd);
+void carrega_constant_pool(ClassFile* classfile,FILE* fd);
+void carrega_class(ClassFile* classfile,FILE* fd);
+void carrega_interfaces(ClassFile* classfile,FILE* fd);
+void carrega_attribute_constant_value(attribute_info* att, FILE* fd);
+void carrega_attribute_code(attribute_info* att, ClassFile* classfile,FILE* fd);
+void carrega_attribute_exception(attribute_info* att,FILE* fd);
 void load_innerclasses_attribute(attribute_info* att,FILE* fd);
 void load_other_attribute(attribute_info* att, FILE* fd);
 void load_fields(ClassFile* classfile,FILE* fd);

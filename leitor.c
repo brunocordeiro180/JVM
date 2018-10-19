@@ -15,7 +15,7 @@ void load_java_versions(ClassFile* cf, FILE* fd)
 }
 
 /*Leitura da constant pool*/
-void load_constantpool(ClassFile* cf, FILE* fd)
+void carrega_constant_pool(ClassFile* cf, FILE* fd)
 {
     cf->constant_pool_count = leU16(fd);
     if (cf->constant_pool_count <= 1)
@@ -84,14 +84,14 @@ void load_constantpool(ClassFile* cf, FILE* fd)
     }
 }
 
-void load_class(ClassFile* cf, FILE* fd)
+void carrega_class(ClassFile* cf, FILE* fd)
 {
     cf->access_flags = leU16(fd);
     cf->this_class = leU16(fd);
     cf->super_class = leU16(fd);
 }
 
-void load_interfaces(ClassFile* cf, FILE* fd)
+void carrega_interfaces(ClassFile* cf, FILE* fd)
 {
     cf->interfaces_count = leU16(fd);
     if (!cf->interfaces_count)
@@ -109,14 +109,14 @@ void load_interfaces(ClassFile* cf, FILE* fd)
 
 /*Carrega o indice da constante que deve ser de acordo com a tabela:
 https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.2-300-C.1*/
-void load_constantvalue_attribute(attribute_info* att, FILE* fd)
+void carrega_attribute_constant_value(attribute_info* att, FILE* fd)
 {
     att->type.ConstantValue.constantvalue_index = leU16(fd);
 }
 
 /*Carrega atributo code, que possui três tabelas de acordo com a tabela:
 https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.2-300-C.1*/
-void load_code_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
+void carrega_attribute_code(attribute_info* att, ClassFile* cf, FILE* fd)
 {
     att->type.Code_attribute.max_stack = leU16(fd);
     att->type.Code_attribute.max_locals = leU16(fd);
@@ -168,7 +168,7 @@ void load_code_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
 }
 /*Carrega os atributos exception*/
 /*Usada pela tabela attributes de method_info*/
-void load_exception_attribute(attribute_info* att, FILE* fd)
+void carrega_attribute_exception(attribute_info* att, FILE* fd)
 {
     att->type.Exceptions.number_of_exceptions = leU16(fd);
     if (att->type.Exceptions.number_of_exceptions == 0)
@@ -234,13 +234,13 @@ void load_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
     switch (typeInt)
     {
     case CONSTANTVALUE:
-        load_constantvalue_attribute(att, fd);
+        carrega_attribute_constant_value(att, fd);
         break;
     case CODE:
-        load_code_attribute(att, cf, fd);
+        carrega_attribute_code(att, cf, fd);
         break;
     case EXCEPTIONS:
-        load_exception_attribute(att, fd);
+        carrega_attribute_exception(att, fd);
         break;
     case INNERCLASSES:
         load_innerclasses_attribute(att, fd);
@@ -329,9 +329,9 @@ void load(FILE* fd, ClassFile** classfile)
 
     load_func_magic(*classfile, fd);
     load_java_versions(*classfile, fd);
-    load_constantpool(*classfile, fd);
-    load_class(*classfile, fd);
-    load_interfaces(*classfile, fd);
+    carrega_constant_pool(*classfile, fd);
+    carrega_class(*classfile, fd);
+    carrega_interfaces(*classfile, fd);
     load_fields(*classfile, fd);
     load_methods(*classfile, fd);
     load_attributes(*classfile, fd);
