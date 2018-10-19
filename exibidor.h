@@ -21,5 +21,5 @@ void print_methodes(ClassFile* cf,FILE* arq);
 void print_atributes(ClassFile* cf,FILE* arq);
 void print(ClassFile* cf,char* namefile,FILE* arq);
 char* look_version(int code);
-
 #endif
+
