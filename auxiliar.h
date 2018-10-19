@@ -10,3 +10,5 @@ void openFiles(int argc, char *argv[], char *filename_in, FILE **arq_in, FILE **
 uint8_t leU8(FILE* fd);
 uint16_t leU16(FILE* fd);
 uint32_t leU32(FILE* fd);
+
+#endif
