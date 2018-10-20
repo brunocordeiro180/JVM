@@ -162,7 +162,7 @@ void carrega_attribute_code(attribute_info* att, ClassFile* cf, FILE* fd)
         attribute_info* att_aux;
         for (att_aux = att->type.Code_attribute.attributes; att_aux < att->type.Code_attribute.attributes + att->type.Code_attribute.attributes_count; ++att_aux)
         {
-            load_attribute(att_aux, cf, fd);
+            carregaAtributoEspecif(att_aux, cf, fd);
         }
     }
 }
@@ -188,7 +188,7 @@ void carrega_attribute_exception(attribute_info* att, FILE* fd)
 
 /*Carrega o atributo InnerClasses*/
 /*Usada pela tabela de atributos de ClassFile*/
-void load_innerclasses_attribute(attribute_info* att, FILE* fd)
+void carregaAtributoInnerClasses(attribute_info* att, FILE* fd)
 {
     att->type.InnerClasses.number_of_classes = leU16(fd);
     if (att->type.InnerClasses.number_of_classes == 0)
@@ -207,7 +207,7 @@ void load_innerclasses_attribute(attribute_info* att, FILE* fd)
     }
 }
 
-void load_other_attribute(attribute_info* att, FILE* fd)
+void carregaAtributo(attribute_info* att, FILE* fd)
 {
     if (!att->attribute_length)
     {
@@ -223,7 +223,7 @@ void load_other_attribute(attribute_info* att, FILE* fd)
 }
 /*Determina qual o tipo de attribute a ser lido e chama a função apropriada*/
 /*Pode ser chamado para ler atributo do ClassFile, Method_info ou Field_info*/
-void load_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
+void carregaAtributoEspecif(attribute_info* att, ClassFile* cf, FILE* fd)
 {
     char* type;
     att->attribute_name_index = leU16(fd);
@@ -243,16 +243,16 @@ void load_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
         carrega_attribute_exception(att, fd);
         break;
     case INNERCLASSES:
-        load_innerclasses_attribute(att, fd);
+        carregaAtributoInnerClasses(att, fd);
         break;
     case OTHER:
-        load_other_attribute(att, fd);
+        carregaAtributo(att, fd);
         break;
     }
     free(type);
 }
 
-void load_fields(ClassFile* cf, FILE* fd)
+void carregaCampos(ClassFile* cf, FILE* fd)
 {
 // carrega os fields. Dois campos na mesma classe não podem ter o mesmo nome.
 
@@ -275,12 +275,12 @@ void load_fields(ClassFile* cf, FILE* fd)
         attribute_info* aux_attribute;
         for (aux_attribute = aux_field->attributes; aux_attribute < aux_field->attributes + aux_field->attributes_count; ++aux_attribute)
         {
-            load_attribute(aux_attribute, cf, fd);
+            carregaAtributoEspecif(aux_attribute, cf, fd);
         }
     }
 }
 
-void load_methods(ClassFile* cf, FILE* fd)
+void carregaMetodos(ClassFile* cf, FILE* fd)
 {
     // carrega os métodos
     cf->method_count = leU16(fd);
@@ -301,12 +301,12 @@ void load_methods(ClassFile* cf, FILE* fd)
         attribute_info* att_aux;
         for (att_aux = aux_method->attributes; att_aux < aux_method->attributes + aux_method->attributes_count; ++att_aux)
         {
-            load_attribute(att_aux, cf, fd);
+            carregaAtributoEspecif(att_aux, cf, fd);
         }
     }
 }
 
-void load_attributes(ClassFile* cf, FILE* fd)
+void carregaAtributos(ClassFile* cf, FILE* fd)
 {
     cf->attributes_count = leU16(fd);
     if (cf->attributes_count == 0)
@@ -318,7 +318,7 @@ void load_attributes(ClassFile* cf, FILE* fd)
     attribute_info* att_aux;
     for (att_aux = cf->attributes; att_aux < cf->attributes + cf->attributes_count; ++att_aux)
     {
-        load_attribute(att_aux, cf, fd);
+        carregaAtributoEspecif(att_aux, cf, fd);
     }
 }
 
@@ -332,7 +332,7 @@ void load(FILE* fd, ClassFile** classfile)
     carrega_constant_pool(*classfile, fd);
     carrega_class(*classfile, fd);
     carrega_interfaces(*classfile, fd);
-    load_fields(*classfile, fd);
-    load_methods(*classfile, fd);
-    load_attributes(*classfile, fd);
+    carregaCampos(*classfile, fd);
+    carregaMetodos(*classfile, fd);
+    carregaAtributos(*classfile, fd);
 }

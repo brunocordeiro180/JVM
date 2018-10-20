@@ -5,16 +5,20 @@
 int main(int argc, char* argv[])
 {
     char filename_in[1024];
-    FILE *file_in = NULL;
-    FILE *file_out = NULL;
+    FILE *fd = NULL;
+    FILE *fo = NULL;
     ClassFile *classfile = NULL;
 
-    openFiles(argc, argv, filename_in, &file_in, &file_out);
-    load(file_in, &classfile);
-    print(classfile, filename_in, file_out);
+    openFiles(argc, argv, filename_in, &fd, &fo);
+    
+    load(fd, &classfile);
+    
+    print(classfile, filename_in, fo);
 
     free_mem(classfile);
-    fclose(file_out);
-    fclose(file_in);
+    
+    fclose(fo);
+    fclose(fd);
+
     return 0;
 }
