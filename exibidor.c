@@ -39,7 +39,7 @@ void imprime_flags(int code, FILE* arq)
     fprintf(arq, "]");
 }
 
-/*Print do CAFEBABE em hexa*/
+/*Imprime o CAFEBABE em hexa*/
 void imprime_magic_func(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "-- MAGIC: %x\n", cf->magic);
@@ -49,7 +49,7 @@ void imprime_magic_func(ClassFile* cf, FILE* arq)
 void imprime_versions(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "-- MINOR VERSION: %d\n", cf->minor_version);
-    char *version_jdk =  look_version(cf->major_version);
+    char *version_jdk =  descobre_versao(cf->major_version);
     fprintf(arq, "MAJOR VERSION: %d - %s\n", cf->major_version, version_jdk);
     free(version_jdk);
 
@@ -158,7 +158,7 @@ void imprime_classdata(ClassFile* cf, FILE* arq)
 
 
 
-void print_interfaces(ClassFile* cf, FILE* arq)
+void imprime_interfaces(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "INTERFACES_COUNT: %d\n", cf->interfaces_count);
     fprintf(arq, "\n");
@@ -178,7 +178,7 @@ void print_interfaces(ClassFile* cf, FILE* arq)
 
 //TODO: Quebrar em mais funções
 /*Imprime um atributo de qualquer tipo*/
-void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
+void imprime_atributo(ClassFile* cf, attribute_info* att, FILE* arq)
 {
 
 //Comeca do 4, https://cs.au.dk/~mis/dOvs/jvmspec/ref-newarray.html
@@ -291,9 +291,9 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
         cp_info* cp;
         for (code = att->type.Code_attribute.code; code < att->type.Code_attribute.code + att->type.Code_attribute.code_length; ++code)
         {
-            fprintf(arq, "\t\t%d | ", (int) (code - (att->type.Code_attribute.code))); //printa a instrucao sem o code em hexa
+            fprintf(arq, "\t\t%d | ", (int) (code - (att->type.Code_attribute.code))); //imprime a instrucao sem o codigo em hexa
 
-            fprintf(arq, "%s ", instruction_name[*code]); //printa a instrucao
+            fprintf(arq, "%s ", instruction_name[*code]); //imprime a instrucao
             uint8_t u1_aux;
             uint16_t u2_aux;
             uint32_t u4_aux;
@@ -645,7 +645,7 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
         attribute_info* aux_att;
         for (aux_att = att->type.Code_attribute.attributes; aux_att < att->type.Code_attribute.attributes + att->type.Code_attribute.attributes_count; ++aux_att)
         {
-            print_atribute(cf, aux_att, arq);
+            imprime_atributo(cf, aux_att, arq);
         }
         break;
     case EXCEPTIONS:
@@ -680,7 +680,7 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
     free(type);
 }
 
-void print_fields(ClassFile* cf, FILE* arq)
+void imprime_campos(ClassFile* cf, FILE* arq)
 {
     int var1 = 0;
     int var2 = 0;
@@ -706,12 +706,12 @@ void print_fields(ClassFile* cf, FILE* arq)
         for (aux_att = aux_field->attributes; aux_att < aux_field->attributes + aux_field->attributes_count; ++aux_att)
         {
             fprintf(arq, "[%d] FIELD_ATTRIBUTE:\n", var2++);
-            print_atribute(cf, aux_att, arq);
+            imprime_atributo(cf, aux_att, arq);
         }
     }
 }
 
-void print_methodes(ClassFile* cf, FILE* arq)
+void imprime_metodos(ClassFile* cf, FILE* arq)
 {
     int var1 = 0;
     int var2 = 0;
@@ -737,13 +737,13 @@ void print_methodes(ClassFile* cf, FILE* arq)
         for (aux_att = aux_meth->attributes; aux_att < aux_meth->attributes + aux_meth->attributes_count; ++aux_att)
         {
             fprintf(arq, "--- [%d] METHOD_ATTRIBUTE:\n", var2++);
-            print_atribute(cf, aux_att, arq);
+            imprime_atributo(cf, aux_att, arq);
         }
     }
 }
 
 
-void print_atributes(ClassFile* cf, FILE* arq)
+void imprime_atributos(ClassFile* cf, FILE* arq)
 {
     int att_itera = 0;
     fprintf(arq, "ATTRIBUTES_COUNT: %d\n", cf->attributes_count);
@@ -757,7 +757,7 @@ void print_atributes(ClassFile* cf, FILE* arq)
     for (aux_att = cf->attributes; aux_att < cf->attributes + cf->attributes_count; ++aux_att)
     {
         fprintf(arq, "[%d] ATTRIBUTE:\n", att_itera++);
-        print_atribute(cf, aux_att, arq);
+        imprime_atributo(cf, aux_att, arq);
     }
 }
 
@@ -772,72 +772,72 @@ void print(ClassFile* cf, char* filename_in, FILE* arq)
     fprintf(arq, "\n");
     imprime_pool_constantes(cf, arq);
     fprintf(arq, "\n");
-    print_interfaces(cf, arq);
+    imprime_interfaces(cf, arq);
     fprintf(arq, "\n");
-    print_fields(cf, arq);
+    imprime_campos(cf, arq);
     fprintf(arq, "\n");
-    print_methodes(cf, arq);
+    imprime_metodos(cf, arq);
     fprintf(arq, "\n");
-    print_atributes(cf, arq);
+    imprime_atributos(cf, arq);
     fprintf(arq, "\n");
 
     printf("Exibicao concluida!\n");
 }
 
-/*A lista utilizada para identificação das major versions pode ser acessada nesse link
+/*A lista utilizada para identificação das major versions pode ser acessada nessa url:
 https://en.wikipedia.org/wiki/Java_class_file#General_layout
 */
 
-char* look_version(int code)
+char* decobre_versao(int codigo)
 {
 
-    char* version_jdk;
-    switch (code)
+    char* versao_jdk;
+    switch (codigo)
     {
     case 45:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.1");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.1");
         break;
     case 46:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.2");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.2");
         break;
     case 47:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.3");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.3");
         break;
     case 48:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.4");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.4");
         break;
     case 49:
-        version_jdk = (char*) malloc(sizeof(char) * 12);
-        strcpy(version_jdk, "Java SE 5.0");
+        versao_jdk = (char*) malloc(sizeof(char) * 12);
+        strcpy(versao_jdk, "Java SE 5.0");
         break;
     case 50:
-        version_jdk = (char*) malloc(sizeof(char) * 12);
-        strcpy(version_jdk, "Java SE 6.0");
+        versao_jdk = (char*) malloc(sizeof(char) * 12);
+        strcpy(versao_jdk, "Java SE 6.0");
         break;
     case 51:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 7");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 7");
         break;
     case 52:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 8");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 8");
         break;
     case 53:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 9");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 9");
         break;
     case 54:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 10");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 10");
         break;
     default:
-        version_jdk = (char*) malloc(sizeof(char) * 21);
-        strcpy(version_jdk, "Java desconhecido");
+        versao_jdk = (char*) malloc(sizeof(char) * 21);
+        strcpy(versao_jdk, "Java desconhecido");
         break;
     }
-    return version_jdk;
+    return versao_jdk;
 }
