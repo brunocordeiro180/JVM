@@ -4,21 +4,20 @@
 
 int main(int argc, char* argv[])
 {
-    char filename_in[1024];
-    FILE *fd = NULL;
-    FILE *fo = NULL;
+    char file_in_name[1024];
+    FILE *file_in = NULL;
+    FILE *file_out = NULL;
     ClassFile *classfile = NULL;
 
-	abreArquivos(filename_in, &fd, &fo, argc, argv);
+	abreArquivos(file_in_name, &file_in, &file_out, argc, argv);
     
-    load(fd, &classfile);
+    load(file_in, &classfile);
     
-    print(classfile, filename_in, fo);
+    print(classfile, file_in_name, file_out);
 
-    liberaMemoria(classfile);
-    
-    fclose(fo);
-    fclose(fd);
+    liberaMemoria(classfile); 
+    fclose(file_out);
+    fclose(file_in);
 
     return 0;
 }
