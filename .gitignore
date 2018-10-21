@@ -1,0 +1,14 @@
+﻿################################################################################
+# Este arquivo .gitignore foi criado automaticamente pelo Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/JVM/v15/ipch/AutoPCH/8a8c7967fd12c4ef/AUXILIAR.ipch
+/.vs/config/applicationhost.config
+/.vs/JVM/v15/ipch/AutoPCH/8a9d7767fd2134bc/AUXILIAR.ipch
+/.vs/JVM/v15/.suo
+/.vs/JVM/v15/Browse.VC.db
+/.vs/JVM/v15/Browse.VC.opendb
+/.vs/slnx.sqlite
+/.vs/ProjectSettings.json
+/.vs/tasks.vs.json
+/.vs/VSWorkspaceState.json
