@@ -2,13 +2,13 @@
 #include "auxiliar.h"
 
 /*Identifica os primeiros bytes do arquivo, valor esperado é CAFEBABE*/
-void load_func_magic(ClassFile* cf, FILE* fd)
+void carregaAssinatura(ClassFile* cf, FILE* fd)
 {
     cf->magic = leU32(fd);
-}
+} 
 
 /*Carrega as versões do JAVA que foram utilizadas para gerar o arquivo .class*/
-void load_java_versions(ClassFile* cf, FILE* fd)
+void leVersao(ClassFile* cf, FILE* fd)
 {
     cf->minor_version = leU16(fd);
     cf->major_version = leU16(fd);
@@ -18,38 +18,40 @@ void load_java_versions(ClassFile* cf, FILE* fd)
 void carrega_constant_pool(ClassFile* cf, FILE* fd)
 {
     cf->constant_pool_count = leU16(fd);
+    
     if (cf->constant_pool_count <= 1)
     {
         cf->constant_pool = NULL;
         return;
     }
+    
     cf->constant_pool = (cp_info*) calloc((cf->constant_pool_count - 1), sizeof(cp_info));
     cp_info *cp;
+    
     for (cp = cf->constant_pool; cp < cf->constant_pool + cf->constant_pool_count - 1; ++cp)
     {
         cp->tag = leU8(fd);
-        switch (cp->tag)
-        {
-        case CLASS:
+        
+        if (cp->tag == CLASS){
             cp->info.Class_info.name_index = leU16(fd);
-            break;
-        case FIELDREF:
+        }
+        else if (cp->tag == FIELDREF){
             cp->info.Fieldref_info.class_index = leU16(fd);
             cp->info.Fieldref_info.name_and_type_index = leU16(fd);
-            break;
-        case METHOD:
+        }
+        else if (cp->tag == METHOD){
             cp->info.Method_info.class_index = leU16(fd);
             cp->info.Method_info.name_and_type_index = leU16(fd);
-            break;
-        case INTERFACE:
+        }
+        else if (cp->tag == INTERFACE){
             cp->info.Interface_info.class_index = leU16(fd);
             cp->info.Interface_info.name_and_type_index = leU16(fd);
-            break;
-        case NAMEANDTYPE:
+        }
+        else if (cp->tag == NAMEANDTYPE){
             cp->info.NameAndType_info.name_index = leU16(fd);
             cp->info.NameAndType_info.descriptor_index = leU16(fd);
-            break;
-        case UTF8:
+        }
+        else if (cp->tag == UTF8){
             cp->info.Utf8_info.length = leU16(fd);
             cp->info.Utf8_info.bytes = (uint8_t*)calloc(cp->info.Utf8_info.length+1, sizeof(uint8_t));
             uint8_t* b;
@@ -57,25 +59,25 @@ void carrega_constant_pool(ClassFile* cf, FILE* fd)
             {
                 *b = leU8(fd);
             }
-            break;
-        case STRING:
+        }
+        else if (cp->tag == STRING){
             cp->info.String_info.string_index = leU16(fd);
-            break;
-        case INTEGER:
+        }
+        else if (cp->tag == INTEGER){
             cp->info.Integer_info.bytes = leU32(fd);
-            break;
-        case FLOAT:
+        }
+        else if (cp->tag == FLOAT){
             cp->info.Float_info.bytes = leU32(fd);
-            break;
-        case LONG:
+        }
+        else if (cp->tag == LONG){
             cp->info.Long_info.high_bytes = leU32(fd);
             cp->info.Long_info.low_bytes = leU32(fd);
-            break;
-        case DOUBLE:
+        }
+        else if (cp->tag == DOUBLE){
             cp->info.Double_info.high_bytes = leU32(fd);
             cp->info.Double_info.low_bytes = leU32(fd);
-            break;
         }
+        
         if (cp->tag == LONG || cp->tag == DOUBLE)
         {
             ++cp;
@@ -94,13 +96,16 @@ void carrega_class(ClassFile* cf, FILE* fd)
 void carrega_interfaces(ClassFile* cf, FILE* fd)
 {
     cf->interfaces_count = leU16(fd);
+    
     if (!cf->interfaces_count)
     {
         cf->interfaces = NULL;
         return;
     }
+    
     cf->interfaces = (uint16_t*) calloc(cf->interfaces_count, sizeof(uint16_t));
     uint16_t* bytes;
+    
     for (bytes = cf->interfaces; bytes < cf->interfaces + cf->interfaces_count; ++bytes)
     {
         *bytes = leU16(fd);
@@ -166,6 +171,7 @@ void carrega_attribute_code(attribute_info* att, ClassFile* cf, FILE* fd)
         }
     }
 }
+
 /*Carrega os atributos exception*/
 /*Usada pela tabela attributes de method_info*/
 void carrega_attribute_exception(attribute_info* att, FILE* fd)
@@ -323,16 +329,4 @@ void carregaAtributos(ClassFile* cf, FILE* fd)
 }
 
 
-void load(FILE* fd, ClassFile** classfile)
-{
-    *classfile = (ClassFile*) calloc(1,sizeof(ClassFile));
 
-    load_func_magic(*classfile, fd);
-    load_java_versions(*classfile, fd);
-    carrega_constant_pool(*classfile, fd);
-    carrega_class(*classfile, fd);
-    carrega_interfaces(*classfile, fd);
-    carregaCampos(*classfile, fd);
-    carregaMetodos(*classfile, fd);
-    carregaAtributos(*classfile, fd);
-}

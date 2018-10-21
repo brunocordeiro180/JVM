@@ -177,6 +177,7 @@ void carrega_attribute_constant_value(attribute_info* att, FILE* fd);
 void carregaAtributoInnerClasses(attribute_info* att,FILE* fd);
 void carrega_attribute_code(attribute_info* att, ClassFile* classfile,FILE* fd);
 void carrega_attribute_exception(attribute_info* att,FILE* fd);
-void load(FILE* fd, ClassFile** classfile);
+void carregaAssinatura(ClassFile* cf, FILE* fd);
+void leVersao(ClassFile* cf, FILE* fd);
 
 #endif
