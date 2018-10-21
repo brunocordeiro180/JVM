@@ -7,7 +7,7 @@
  *
  * \param
  * \param
- * \return
+ * \return Constante correspondente
  *
  */
 int verificaTipo(char* tipo)
