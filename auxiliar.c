@@ -1,18 +1,37 @@
 #include <errno.h>
 #include "leitor.h"
+#include "auxiliar.h"
 #define IN 1
 #define OUT 2
+
+uint8_t leU8(FILE* fd)
+{
+    return getc(fd);
+}
+
+uint16_t leU16(FILE* fd)
+{
+    uint16_t retorno = getc(fd);
+    retorno = (retorno << 8)|(getc(fd));
+    return retorno;
+}
+
+uint32_t leU32(FILE* fd)
+{
+    uint32_t retorno = leU16(fd) << 16;
+	retorno |= leU16(fd);
+    return retorno;
+}
 
 /** \brief Retorna tipo da string
  *
  * \param
  * \param
- * \return
+ * \return Constante correspondente
  *
  */
 int verificaTipo(char* tipo)
 {
-    
     if(!strcmp(tipo, "Code"))
     {
         return CODE;
@@ -41,7 +60,7 @@ int verificaTipo(char* tipo)
  * \return void.
  *
  */
-void free_constpool(ClassFile *classfile)
+void liberaConstantPool(ClassFile *classfile)
 {
     cp_info *it;
     cp_info *first_cp = classfile->constant_pool;
@@ -63,11 +82,11 @@ void free_constpool(ClassFile *classfile)
  * \return void
  *
  */
-void free_mem(ClassFile* classfile)
+void liberaMemoria(ClassFile* classfile)
 {
     if(classfile)
     {
-        free_constpool(classfile);
+        liberaConstantPool(classfile);
         if(classfile->fields)
             free(classfile->fields);
         if(classfile->interfaces)
@@ -78,25 +97,6 @@ void free_mem(ClassFile* classfile)
     }
 }
 
-uint8_t leU8(FILE* fd)
-{
-    return getc(fd);
-}
-
-uint16_t leU16(FILE* fd)
-{
-    uint16_t toReturn = getc(fd);
-    toReturn = (toReturn << 8)|(getc(fd));
-    return toReturn;
-}
-
-uint32_t leU32(FILE* fd)
-{
-    uint32_t toReturn = leU16(fd) << 16;
-    toReturn |= leU16(fd);
-    return toReturn;
-}
-
 /** \brief Abre o arquivo e faz checagem
  *
  * \param *filename = nome do arquivo a ser aberto.
@@ -104,7 +104,7 @@ uint32_t leU32(FILE* fd)
  * \return arquivo aberto ou NULL.
  *
  */
-FILE* open_file(char *filename, int mode)
+FILE* abreArquivo(char *filename, int mode)
 {
     FILE* arq = fopen(filename, (mode==IN?"rb":"w+"));
 
@@ -125,7 +125,7 @@ FILE* open_file(char *filename, int mode)
  * \return void
  *
  */
-void openFiles(int argc, char *argv[], char *filename_in, FILE **file_in, FILE **file_out)
+void abreArquivos(char *filename_in, FILE **file_in, FILE **file_out, int argc, char *argv[])
 {
     char filename_out[1024];
 
@@ -139,14 +139,14 @@ void openFiles(int argc, char *argv[], char *filename_in, FILE **file_in, FILE *
             printf("Digite o nome do arquivo de saida: ");
             scanf("%s", filename_out);
             fflush(stdin);
-            (*file_in) = open_file(filename_in, IN);
+            (*file_in) = abreArquivo(filename_in, IN);
         }
         while(!(*file_in));
         break;
     case(3):
         strcpy(filename_in, argv[1]);
         strcpy(filename_out, argv[2]);
-        (*file_in) = open_file(filename_in, IN);
+        (*file_in) = abreArquivo(filename_in, IN);
         while(!(*file_in))
         {
             printf("Digite o nome do arquivo de entrada: ");
@@ -154,7 +154,7 @@ void openFiles(int argc, char *argv[], char *filename_in, FILE **file_in, FILE *
             printf("Digite o nome do arquivo de saida: ");
             scanf("%s", filename_out);
             fflush(stdin);
-            (*file_in) = open_file(filename_in, IN);
+            (*file_in) = abreArquivo(filename_in, IN);
         }
         break;
     default:
@@ -164,7 +164,7 @@ void openFiles(int argc, char *argv[], char *filename_in, FILE **file_in, FILE *
         exit(0);
         break;
     }
-    if(!(*file_out = open_file(filename_out, OUT)))
+    if(!(*file_out = abreArquivo(filename_out, OUT)))
     {
         exit(0);
     }

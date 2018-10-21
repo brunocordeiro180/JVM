@@ -9,13 +9,13 @@ int main(int argc, char* argv[])
     FILE *fo = NULL;
     ClassFile *classfile = NULL;
 
-    openFiles(argc, argv, filename_in, &fd, &fo);
+	abreArquivos(filename_in, &fd, &fo, argc, argv);
     
     load(fd, &classfile);
     
     print(classfile, filename_in, fo);
 
-    free_mem(classfile);
+    liberaMemoria(classfile);
     
     fclose(fo);
     fclose(fd);
