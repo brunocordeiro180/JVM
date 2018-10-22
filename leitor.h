@@ -7,6 +7,7 @@
 #ifndef LEITOR_H
 #define LEITOR_H
 
+/* Tags definidas */
 #define CONTINUED 0
 #define CODE 1
 #define UTF8 1
@@ -24,6 +25,7 @@
 #define METHOD 10
 #define INTERFACE 11
 #define NAMEANDTYPE 12
+/******************/
 
 typedef struct
 {
@@ -164,6 +166,8 @@ typedef struct
     attribute_info* attributes;
 } ClassFile;
 
+
+/* Funcoes utilizadas na leitura completa do .class */
 void carrega_versoes(ClassFile* classfile,FILE* fd);
 void carrega_constant_pool(ClassFile* classfile,FILE* fd);
 void carregaMetodos(ClassFile* classfile,FILE* fd);
@@ -179,5 +183,6 @@ void carrega_attribute_code(attribute_info* att, ClassFile* classfile,FILE* fd);
 void carrega_attribute_exception(attribute_info* att,FILE* fd);
 void carregaAssinatura(ClassFile* cf, FILE* fd);
 void leVersao(ClassFile* cf, FILE* fd);
+/****************************************************/
 
 #endif

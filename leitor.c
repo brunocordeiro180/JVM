@@ -7,6 +7,109 @@ void carregaAssinatura(ClassFile* cf, FILE* fd)
     cf->magic = leU32(fd);
 } 
 
+/* Carrega atributo code */
+void carrega_attribute_code(attribute_info* att, ClassFile* cf, FILE* fd)
+{
+    att->type.Code_attribute.max_stack = leU16(fd);
+    att->type.Code_attribute.max_locals = leU16(fd);
+    att->type.Code_attribute.code_length = leU32(fd);
+    if (att->type.Code_attribute.code_length == 0)
+    {
+        att->type.Code_attribute.code = NULL;
+    }
+    else
+    {
+        att->type.Code_attribute.code = (uint8_t*)calloc(att->type.Code_attribute.code_length, sizeof(uint8_t));
+        uint8_t* byte;
+        for (byte = att->type.Code_attribute.code; byte < att->type.Code_attribute.code + att->type.Code_attribute.code_length; ++byte)
+        {
+            *byte = leU8(fd);
+        }
+    }
+    att->type.Code_attribute.exception_table_length = leU16(fd);
+    if (att->type.Code_attribute.exception_table_length == 0)
+    {
+        att->type.Code_attribute.exception_table = NULL;
+    }
+    else
+    {
+        att->type.Code_attribute.exception_table = (exception_table_info*)calloc(att->type.Code_attribute.exception_table_length,sizeof(exception_table_info));
+        exception_table_info* exp_aux;
+        for (exp_aux = att->type.Code_attribute.exception_table; exp_aux < att->type.Code_attribute.exception_table + att->type.Code_attribute.exception_table_length; ++exp_aux)
+        {
+            exp_aux->start_pc = leU16(fd);
+            exp_aux->end_pc = leU16(fd);
+            exp_aux->handler_pc = leU16(fd);
+            exp_aux->catch_type = leU16(fd);
+        }
+    }
+    att->type.Code_attribute.attributes_count = leU16(fd);
+    if (att->type.Code_attribute.attributes_count == 0)
+    {
+        att->type.Code_attribute.attributes = NULL;
+    }
+    else
+    {
+        att->type.Code_attribute.attributes = (attribute_info*)calloc(att->type.Code_attribute.attributes_count,sizeof(attribute_info));
+        attribute_info* att_aux;
+        for (att_aux = att->type.Code_attribute.attributes; att_aux < att->type.Code_attribute.attributes + att->type.Code_attribute.attributes_count; ++att_aux)
+        {
+            carregaAtributoEspecif(att_aux, cf, fd);
+        }
+    }
+}
+
+/*Carrega os atributos exception*/
+/*Usada pela tabela attributes de method_info*/
+void carrega_attribute_exception(attribute_info* att, FILE* fd)
+{
+    att->type.Exceptions.number_of_exceptions = leU16(fd);
+    if (att->type.Exceptions.number_of_exceptions == 0)
+    {
+        att->type.Exceptions.exception_index_table = NULL;
+    }
+    else
+    {
+        att->type.Exceptions.exception_index_table = (uint16_t*) calloc(att->type.Exceptions.number_of_exceptions,sizeof(uint16_t));
+        uint16_t* bytes;
+        for (bytes = att->type.Exceptions.exception_index_table; bytes < att->type.Exceptions.exception_index_table + att->type.Exceptions.number_of_exceptions; ++bytes)
+        {
+            *bytes = leU16(fd);
+        }
+    }
+}
+
+/*Determina qual o tipo de attribute a ser lido e chama a função apropriada*/
+/*Pode ser chamado para ler atributo do ClassFile, Method_info ou Field_info*/
+void carregaAtributoEspecif(attribute_info* att, ClassFile* cf, FILE* fd)
+{
+    char* type;
+    att->attribute_name_index = leU16(fd);
+    att->attribute_length = leU32(fd);
+    type = (char*)calloc(cf->constant_pool[att->attribute_name_index - 1].info.Utf8_info.length+1,sizeof(char));
+    strcpy(type, (char*)cf->constant_pool[att->attribute_name_index - 1].info.Utf8_info.bytes);
+    int typeInt = verificaTipo(type);
+    switch (typeInt)
+    {
+    case CONSTANTVALUE:
+        carrega_attribute_constant_value(att, fd);
+        break;
+    case CODE:
+        carrega_attribute_code(att, cf, fd);
+        break;
+    case EXCEPTIONS:
+        carrega_attribute_exception(att, fd);
+        break;
+    case INNERCLASSES:
+        carregaAtributoInnerClasses(att, fd);
+        break;
+    case OTHER:
+        carregaAtributo(att, fd);
+        break;
+    }
+    free(type);
+}
+
 /*Carrega as versões do JAVA que foram utilizadas para gerar o arquivo .class*/
 void leVersao(ClassFile* cf, FILE* fd)
 {
@@ -86,6 +189,7 @@ void carrega_constant_pool(ClassFile* cf, FILE* fd)
     }
 }
 
+/* Carrega os campos que indicam o acesso da classe, a classe em si e a super classe */
 void carrega_class(ClassFile* cf, FILE* fd)
 {
     cf->access_flags = leU16(fd);
@@ -93,6 +197,7 @@ void carrega_class(ClassFile* cf, FILE* fd)
     cf->super_class = leU16(fd);
 }
 
+/* Carregamento de interfaces */
 void carrega_interfaces(ClassFile* cf, FILE* fd)
 {
     cf->interfaces_count = leU16(fd);
@@ -112,82 +217,63 @@ void carrega_interfaces(ClassFile* cf, FILE* fd)
     }
 }
 
-/*Carrega o indice da constante que deve ser de acordo com a tabela:
-https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.2-300-C.1*/
+/* Carrega o indice da constante */
 void carrega_attribute_constant_value(attribute_info* att, FILE* fd)
 {
     att->type.ConstantValue.constantvalue_index = leU16(fd);
 }
 
-/*Carrega atributo code, que possui três tabelas de acordo com a tabela:
-https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.2-300-C.1*/
-void carrega_attribute_code(attribute_info* att, ClassFile* cf, FILE* fd)
+/* Funcao para carregar os fields */
+void carregaCampos(ClassFile* cf, FILE* fd)
 {
-    att->type.Code_attribute.max_stack = leU16(fd);
-    att->type.Code_attribute.max_locals = leU16(fd);
-    att->type.Code_attribute.code_length = leU32(fd);
-    if (att->type.Code_attribute.code_length == 0)
+
+
+    cf->fields_count = leU16(fd);
+
+    if (cf->fields_count == 0)
     {
-        att->type.Code_attribute.code = NULL;
+        cf->fields = NULL;
+        return;
     }
-    else
+    cf->fields = (field_info*)calloc(cf->fields_count,sizeof(field_info));
+    field_info* aux_field;
+    for (aux_field = cf->fields; aux_field < cf->fields + cf->fields_count; ++aux_field)
     {
-        att->type.Code_attribute.code = (uint8_t*)calloc(att->type.Code_attribute.code_length, sizeof(uint8_t));
-        uint8_t* byte;
-        for (byte = att->type.Code_attribute.code; byte < att->type.Code_attribute.code + att->type.Code_attribute.code_length; ++byte)
+        aux_field->access_flags = leU16(fd);
+        aux_field->name_index = leU16(fd);
+        aux_field->descriptor_index = leU16(fd);
+        aux_field->attributes_count = leU16(fd);
+        aux_field->attributes = calloc(aux_field->attributes_count,sizeof(attribute_info));
+        attribute_info* aux_attribute;
+        for (aux_attribute = aux_field->attributes; aux_attribute < aux_field->attributes + aux_field->attributes_count; ++aux_attribute)
         {
-            *byte = leU8(fd);
-        }
-    }
-    att->type.Code_attribute.exception_table_length = leU16(fd);
-    if (att->type.Code_attribute.exception_table_length == 0)
-    {
-        att->type.Code_attribute.exception_table = NULL;
-    }
-    else
-    {
-        att->type.Code_attribute.exception_table = (exception_table_info*)calloc(att->type.Code_attribute.exception_table_length,sizeof(exception_table_info));
-        exception_table_info* exp_aux;
-        for (exp_aux = att->type.Code_attribute.exception_table; exp_aux < att->type.Code_attribute.exception_table + att->type.Code_attribute.exception_table_length; ++exp_aux)
-        {
-            exp_aux->start_pc = leU16(fd);
-            exp_aux->end_pc = leU16(fd);
-            exp_aux->handler_pc = leU16(fd);
-            exp_aux->catch_type = leU16(fd);
-        }
-    }
-    att->type.Code_attribute.attributes_count = leU16(fd);
-    if (att->type.Code_attribute.attributes_count == 0)
-    {
-        att->type.Code_attribute.attributes = NULL;
-    }
-    else
-    {
-        att->type.Code_attribute.attributes = (attribute_info*)calloc(att->type.Code_attribute.attributes_count,sizeof(attribute_info));
-        attribute_info* att_aux;
-        for (att_aux = att->type.Code_attribute.attributes; att_aux < att->type.Code_attribute.attributes + att->type.Code_attribute.attributes_count; ++att_aux)
-        {
-            carregaAtributoEspecif(att_aux, cf, fd);
+            carregaAtributoEspecif(aux_attribute, cf, fd);
         }
     }
 }
 
-/*Carrega os atributos exception*/
-/*Usada pela tabela attributes de method_info*/
-void carrega_attribute_exception(attribute_info* att, FILE* fd)
+/* Funcao para carregar os metodos do arquivo .class */
+void carregaMetodos(ClassFile* cf, FILE* fd)
 {
-    att->type.Exceptions.number_of_exceptions = leU16(fd);
-    if (att->type.Exceptions.number_of_exceptions == 0)
+    cf->method_count = leU16(fd);
+    if (cf->method_count == 0)
     {
-        att->type.Exceptions.exception_index_table = NULL;
+        cf->methods = NULL;
+        return;
     }
-    else
+    cf->methods = (method_info*) calloc(cf->method_count, sizeof(method_info));
+    method_info* aux_method;
+    for (aux_method = cf->methods; aux_method < cf->methods + cf->method_count; ++aux_method)
     {
-        att->type.Exceptions.exception_index_table = (uint16_t*) calloc(att->type.Exceptions.number_of_exceptions,sizeof(uint16_t));
-        uint16_t* bytes;
-        for (bytes = att->type.Exceptions.exception_index_table; bytes < att->type.Exceptions.exception_index_table + att->type.Exceptions.number_of_exceptions; ++bytes)
+        aux_method->access_flags = leU16(fd);
+        aux_method->name_index = leU16(fd);
+        aux_method->descriptor_index = leU16(fd);
+        aux_method->attributes_count = leU16(fd);
+        aux_method->attributes = (attribute_info*) calloc(aux_method->attributes_count, sizeof(attribute_info));
+        attribute_info* att_aux;
+        for (att_aux = aux_method->attributes; att_aux < aux_method->attributes + aux_method->attributes_count; ++att_aux)
         {
-            *bytes = leU16(fd);
+            carregaAtributoEspecif(att_aux, cf, fd);
         }
     }
 }
@@ -225,90 +311,6 @@ void carregaAtributo(attribute_info* att, FILE* fd)
     for (bytes = att->type.Other.bytes; bytes < att->type.Other.bytes + att->attribute_length; ++bytes)
     {
         *bytes = leU8(fd);
-    }
-}
-/*Determina qual o tipo de attribute a ser lido e chama a função apropriada*/
-/*Pode ser chamado para ler atributo do ClassFile, Method_info ou Field_info*/
-void carregaAtributoEspecif(attribute_info* att, ClassFile* cf, FILE* fd)
-{
-    char* type;
-    att->attribute_name_index = leU16(fd);
-    att->attribute_length = leU32(fd);
-    type = (char*)calloc(cf->constant_pool[att->attribute_name_index - 1].info.Utf8_info.length+1,sizeof(char));
-    strcpy(type, (char*)cf->constant_pool[att->attribute_name_index - 1].info.Utf8_info.bytes);
-    int typeInt = verificaTipo(type);
-    switch (typeInt)
-    {
-    case CONSTANTVALUE:
-        carrega_attribute_constant_value(att, fd);
-        break;
-    case CODE:
-        carrega_attribute_code(att, cf, fd);
-        break;
-    case EXCEPTIONS:
-        carrega_attribute_exception(att, fd);
-        break;
-    case INNERCLASSES:
-        carregaAtributoInnerClasses(att, fd);
-        break;
-    case OTHER:
-        carregaAtributo(att, fd);
-        break;
-    }
-    free(type);
-}
-
-void carregaCampos(ClassFile* cf, FILE* fd)
-{
-// carrega os fields. Dois campos na mesma classe não podem ter o mesmo nome.
-
-    cf->fields_count = leU16(fd);
-
-    if (cf->fields_count == 0)
-    {
-        cf->fields = NULL;
-        return;
-    }
-    cf->fields = (field_info*)calloc(cf->fields_count,sizeof(field_info));
-    field_info* aux_field;
-    for (aux_field = cf->fields; aux_field < cf->fields + cf->fields_count; ++aux_field)
-    {
-        aux_field->access_flags = leU16(fd);
-        aux_field->name_index = leU16(fd);
-        aux_field->descriptor_index = leU16(fd);
-        aux_field->attributes_count = leU16(fd);
-        aux_field->attributes = calloc(aux_field->attributes_count,sizeof(attribute_info));
-        attribute_info* aux_attribute;
-        for (aux_attribute = aux_field->attributes; aux_attribute < aux_field->attributes + aux_field->attributes_count; ++aux_attribute)
-        {
-            carregaAtributoEspecif(aux_attribute, cf, fd);
-        }
-    }
-}
-
-void carregaMetodos(ClassFile* cf, FILE* fd)
-{
-    // carrega os métodos
-    cf->method_count = leU16(fd);
-    if (cf->method_count == 0)
-    {
-        cf->methods = NULL;
-        return;
-    }
-    cf->methods = (method_info*) calloc(cf->method_count, sizeof(method_info));
-    method_info* aux_method;
-    for (aux_method = cf->methods; aux_method < cf->methods + cf->method_count; ++aux_method)
-    {
-        aux_method->access_flags = leU16(fd);
-        aux_method->name_index = leU16(fd);
-        aux_method->descriptor_index = leU16(fd);
-        aux_method->attributes_count = leU16(fd);
-        aux_method->attributes = (attribute_info*) calloc(aux_method->attributes_count, sizeof(attribute_info));
-        attribute_info* att_aux;
-        for (att_aux = aux_method->attributes; att_aux < aux_method->attributes + aux_method->attributes_count; ++att_aux)
-        {
-            carregaAtributoEspecif(att_aux, cf, fd);
-        }
     }
 }
 
