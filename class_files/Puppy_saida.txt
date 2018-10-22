@@ -1,0 +1,422 @@
+Nome do arquivo: ./class_files/Puppy.class
+
+
+----------
+# MAGIC: cafebabe
+
+----------
+# MINOR VERSION: 0
+MAJOR VERSION: 52 - Java SE 8
+# CONSTANT POOL COUNT: 63
+# ACCESS_FLAGS: 21 [public super ]
+# THIS_CLASS: 12
+# SUPER_CLASS: 18
+# INTERFACES_COUNT: 0
+# FIELDS_COUNT: 1
+# METHODS_COUNT: 4
+# ATTRIBUTES_COUNT: 1
+
+
+----------
+- CONSTANT POOL COUNT: 63
+- CONSTANT_POOL:
+[1]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 18: java/lang/Object
+ ## NAMEANDTYPE_INDEX: 33: <init>()V
+[2]
+ ## CP_INFO: FIELDREF
+ ## CLASS_INDEX: 34: java/lang/System
+ ## NAMEANDTYPE_INDEX: 35: outLjava/io/PrintStream;
+[3]
+ ## CP_INFO: CLASS
+ ## NAME_INDEX: 36: java/lang/StringBuilder
+[4]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 3: java/lang/StringBuilder
+ ## NAMEANDTYPE_INDEX: 33: <init>()V
+[5]
+ ## CP_INFO: STRING
+ ## STRING_INDEX: 37: Name chosen is :
+[6]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 3: java/lang/StringBuilder
+ ## NAMEANDTYPE_INDEX: 38: append(Ljava/lang/String;)Ljava/lang/StringBuilder;
+[7]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 3: java/lang/StringBuilder
+ ## NAMEANDTYPE_INDEX: 39: toString()Ljava/lang/String;
+[8]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 40: java/io/PrintStream
+ ## NAMEANDTYPE_INDEX: 41: println(Ljava/lang/String;)V
+[9]
+ ## CP_INFO: FIELDREF
+ ## CLASS_INDEX: 12: Puppy
+ ## NAMEANDTYPE_INDEX: 42: puppyAgeI
+[10]
+ ## CP_INFO: STRING
+ ## STRING_INDEX: 43: Puppy's age is :
+[11]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 3: java/lang/StringBuilder
+ ## NAMEANDTYPE_INDEX: 44: append(I)Ljava/lang/StringBuilder;
+[12]
+ ## CP_INFO: CLASS
+ ## NAME_INDEX: 45: Puppy
+[13]
+ ## CP_INFO: STRING
+ ## STRING_INDEX: 46: tommy
+[14]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 12: Puppy
+ ## NAMEANDTYPE_INDEX: 47: <init>(Ljava/lang/String;)V
+[15]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 12: Puppy
+ ## NAMEANDTYPE_INDEX: 48: setAge(I)V
+[16]
+ ## CP_INFO: METHOD
+ ## CLASS_INDEX: 12: Puppy
+ ## NAMEANDTYPE_INDEX: 49: getAge()I
+[17]
+ ## CP_INFO: STRING
+ ## STRING_INDEX: 50: Variable Value :
+[18]
+ ## CP_INFO: CLASS
+ ## NAME_INDEX: 51: java/lang/Object
+[19]
+ ## CP_INFO: UTF8
+ ## LENGTH: 8
+ ## VALUE: puppyAge
+[20]
+ ## CP_INFO: UTF8
+ ## LENGTH: 1
+ ## VALUE: I
+[21]
+ ## CP_INFO: UTF8
+ ## LENGTH: 6
+ ## VALUE: <init>
+[22]
+ ## CP_INFO: UTF8
+ ## LENGTH: 21
+ ## VALUE: (Ljava/lang/String;)V
+[23]
+ ## CP_INFO: UTF8
+ ## LENGTH: 4
+ ## VALUE: Code
+[24]
+ ## CP_INFO: UTF8
+ ## LENGTH: 15
+ ## VALUE: LineNumberTable
+[25]
+ ## CP_INFO: UTF8
+ ## LENGTH: 6
+ ## VALUE: setAge
+[26]
+ ## CP_INFO: UTF8
+ ## LENGTH: 4
+ ## VALUE: (I)V
+[27]
+ ## CP_INFO: UTF8
+ ## LENGTH: 6
+ ## VALUE: getAge
+[28]
+ ## CP_INFO: UTF8
+ ## LENGTH: 3
+ ## VALUE: ()I
+[29]
+ ## CP_INFO: UTF8
+ ## LENGTH: 4
+ ## VALUE: main
+[30]
+ ## CP_INFO: UTF8
+ ## LENGTH: 22
+ ## VALUE: ([Ljava/lang/String;)V
+[31]
+ ## CP_INFO: UTF8
+ ## LENGTH: 10
+ ## VALUE: SourceFile
+[32]
+ ## CP_INFO: UTF8
+ ## LENGTH: 10
+ ## VALUE: Puppy.java
+[33]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 21: <init>
+ ## DESCRIPTOR_INDEX: 52: ()V
+[34]
+ ## CP_INFO: CLASS
+ ## NAME_INDEX: 53: java/lang/System
+[35]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 54: out
+ ## DESCRIPTOR_INDEX: 55: Ljava/io/PrintStream;
+[36]
+ ## CP_INFO: UTF8
+ ## LENGTH: 23
+ ## VALUE: java/lang/StringBuilder
+[37]
+ ## CP_INFO: UTF8
+ ## LENGTH: 16
+ ## VALUE: Name chosen is :
+[38]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 56: append
+ ## DESCRIPTOR_INDEX: 57: (Ljava/lang/String;)Ljava/lang/StringBuilder;
+[39]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 58: toString
+ ## DESCRIPTOR_INDEX: 59: ()Ljava/lang/String;
+[40]
+ ## CP_INFO: CLASS
+ ## NAME_INDEX: 60: java/io/PrintStream
+[41]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 61: println
+ ## DESCRIPTOR_INDEX: 22: (Ljava/lang/String;)V
+[42]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 19: puppyAge
+ ## DESCRIPTOR_INDEX: 20: I
+[43]
+ ## CP_INFO: UTF8
+ ## LENGTH: 16
+ ## VALUE: Puppy's age is :
+[44]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 56: append
+ ## DESCRIPTOR_INDEX: 62: (I)Ljava/lang/StringBuilder;
+[45]
+ ## CP_INFO: UTF8
+ ## LENGTH: 5
+ ## VALUE: Puppy
+[46]
+ ## CP_INFO: UTF8
+ ## LENGTH: 5
+ ## VALUE: tommy
+[47]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 21: <init>
+ ## DESCRIPTOR_INDEX: 22: (Ljava/lang/String;)V
+[48]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 25: setAge
+ ## DESCRIPTOR_INDEX: 26: (I)V
+[49]
+ ## CP_INFO: NAMEANDTYPE
+ ## NAME_INDEX: 27: getAge
+ ## DESCRIPTOR_INDEX: 28: ()I
+[50]
+ ## CP_INFO: UTF8
+ ## LENGTH: 16
+ ## VALUE: Variable Value :
+[51]
+ ## CP_INFO: UTF8
+ ## LENGTH: 16
+ ## VALUE: java/lang/Object
+[52]
+ ## CP_INFO: UTF8
+ ## LENGTH: 3
+ ## VALUE: ()V
+[53]
+ ## CP_INFO: UTF8
+ ## LENGTH: 16
+ ## VALUE: java/lang/System
+[54]
+ ## CP_INFO: UTF8
+ ## LENGTH: 3
+ ## VALUE: out
+[55]
+ ## CP_INFO: UTF8
+ ## LENGTH: 21
+ ## VALUE: Ljava/io/PrintStream;
+[56]
+ ## CP_INFO: UTF8
+ ## LENGTH: 6
+ ## VALUE: append
+[57]
+ ## CP_INFO: UTF8
+ ## LENGTH: 45
+ ## VALUE: (Ljava/lang/String;)Ljava/lang/StringBuilder;
+[58]
+ ## CP_INFO: UTF8
+ ## LENGTH: 8
+ ## VALUE: toString
+[59]
+ ## CP_INFO: UTF8
+ ## LENGTH: 20
+ ## VALUE: ()Ljava/lang/String;
+[60]
+ ## CP_INFO: UTF8
+ ## LENGTH: 19
+ ## VALUE: java/io/PrintStream
+[61]
+ ## CP_INFO: UTF8
+ ## LENGTH: 7
+ ## VALUE: println
+[62]
+ ## CP_INFO: UTF8
+ ## LENGTH: 28
+ ## VALUE: (I)Ljava/lang/StringBuilder;
+
+----------
+INTERFACES_COUNT: 0
+
+INTERFACES:
+
+
+
+----------
+FIELDS_COUNT: 1
+FIELDS:
+	[0]
+	NAME_INDEX: 19: puppyAge
+	DESCRIPTOR_INDEX: 20: I
+	ACCESS_FLAGS: 0 []
+	ATTRIBUTE_COUNT: 0
+
+
+----------
+METHODS_COUNT: 4
+METHODS:
+[0]
+##  NAME_INDEX: 21: <init>
+##  DESCRIPTOR_INDEX: 22: (Ljava/lang/String;)V
+##  ACCESS_FLAGS: 1 [public ]
+##  ATTRIBUTE_COUNT: 1
+##  [0] METHOD_ATTRIBUTE:
+	ATTRIBUTE_NAME_INDEX: 23 : Code
+	ATTRIBUTE_LENGTH: 62
+
+	TYPE: CODE
+	MAX_STACK: 3
+	MAX_LOCALS: 2
+	CODE_LENGTH: 30
+	CODE:
+		0 | aload_0 
+		1 | invokespecial #1 <java/lang/Object.<init>>
+		4 | getstatic #2
+		7 | new #3, <java/lang/StringBuilder>
+		10 | dup 
+		11 | invokespecial #4 <java/lang/StringBuilder.<init>>
+		14 | ldc #4
+		16 | invokevirtual #6 <java/lang/StringBuilder.append>
+		19 | aload_1 
+		20 | invokevirtual #6 <java/lang/StringBuilder.append>
+		23 | invokevirtual #7 <java/lang/StringBuilder.toString>
+		26 | invokevirtual #8 <java/io/PrintStream.println>
+		29 | return 
+##  EXCEPTION_TABLE_LENGTH: 0
+##  ATTRIBUTES_COUNT: 1
+	ATTRIBUTE_NAME_INDEX: 24 : LineNumberTable
+	ATTRIBUTE_LENGTH: 14
+
+[1]
+##  NAME_INDEX: 25: setAge
+##  DESCRIPTOR_INDEX: 26: (I)V
+##  ACCESS_FLAGS: 1 [public ]
+##  ATTRIBUTE_COUNT: 1
+##  [1] METHOD_ATTRIBUTE:
+	ATTRIBUTE_NAME_INDEX: 23 : Code
+	ATTRIBUTE_LENGTH: 34
+
+	TYPE: CODE
+	MAX_STACK: 2
+	MAX_LOCALS: 2
+	CODE_LENGTH: 6
+	CODE:
+		0 | aload_0 
+		1 | iload_1 
+		2 | putfield #9 <Puppy.puppyAge>
+		5 | return 
+##  EXCEPTION_TABLE_LENGTH: 0
+##  ATTRIBUTES_COUNT: 1
+	ATTRIBUTE_NAME_INDEX: 24 : LineNumberTable
+	ATTRIBUTE_LENGTH: 10
+
+[2]
+##  NAME_INDEX: 27: getAge
+##  DESCRIPTOR_INDEX: 28: ()I
+##  ACCESS_FLAGS: 1 [public ]
+##  ATTRIBUTE_COUNT: 1
+##  [2] METHOD_ATTRIBUTE:
+	ATTRIBUTE_NAME_INDEX: 23 : Code
+	ATTRIBUTE_LENGTH: 61
+
+	TYPE: CODE
+	MAX_STACK: 3
+	MAX_LOCALS: 1
+	CODE_LENGTH: 33
+	CODE:
+		0 | getstatic #2
+		3 | new #3, <java/lang/StringBuilder>
+		6 | dup 
+		7 | invokespecial #4 <java/lang/StringBuilder.<init>>
+		10 | ldc #4
+		12 | invokevirtual #6 <java/lang/StringBuilder.append>
+		15 | aload_0 
+		16 | getfield #9 <Puppy.puppyAge>
+		19 | invokevirtual #11 <java/lang/StringBuilder.append>
+		22 | invokevirtual #7 <java/lang/StringBuilder.toString>
+		25 | invokevirtual #8 <java/io/PrintStream.println>
+		28 | aload_0 
+		29 | getfield #9 <Puppy.puppyAge>
+		32 | ireturn 
+##  EXCEPTION_TABLE_LENGTH: 0
+##  ATTRIBUTES_COUNT: 1
+	ATTRIBUTE_NAME_INDEX: 24 : LineNumberTable
+	ATTRIBUTE_LENGTH: 10
+
+[3]
+##  NAME_INDEX: 29: main
+##  DESCRIPTOR_INDEX: 30: ([Ljava/lang/String;)V
+##  ACCESS_FLAGS: 9 [public static ]
+##  ATTRIBUTE_COUNT: 1
+##  [3] METHOD_ATTRIBUTE:
+	ATTRIBUTE_NAME_INDEX: 23 : Code
+	ATTRIBUTE_LENGTH: 89
+
+	TYPE: CODE
+	MAX_STACK: 3
+	MAX_LOCALS: 2
+	CODE_LENGTH: 49
+	CODE:
+		0 | new #12, <Puppy>
+		3 | dup 
+		4 | ldc #12
+		6 | invokespecial #14 <Puppy.<init>>
+		9 | astore_1 
+		10 | aload_1 
+		11 | iconst_2 
+		12 | invokevirtual #15 <Puppy.setAge>
+		15 | aload_1 
+		16 | invokevirtual #16 <Puppy.getAge>
+		19 | pop 
+		20 | getstatic #2
+		23 | new #3, <java/lang/StringBuilder>
+		26 | dup 
+		27 | invokespecial #4 <java/lang/StringBuilder.<init>>
+		30 | ldc #4
+		32 | invokevirtual #6 <java/lang/StringBuilder.append>
+		35 | aload_1 
+		36 | getfield #9 <Puppy.puppyAge>
+		39 | invokevirtual #11 <java/lang/StringBuilder.append>
+		42 | invokevirtual #7 <java/lang/StringBuilder.toString>
+		45 | invokevirtual #8 <java/io/PrintStream.println>
+		48 | return 
+##  EXCEPTION_TABLE_LENGTH: 0
+##  ATTRIBUTES_COUNT: 1
+	ATTRIBUTE_NAME_INDEX: 24 : LineNumberTable
+	ATTRIBUTE_LENGTH: 22
+
+
+----------
+ATTRIBUTES_COUNT: 1
+ATTRIBUTES:
+[0] ATTRIBUTE:
+	ATTRIBUTE_NAME_INDEX: 31 : SourceFile
+	ATTRIBUTE_LENGTH: 2
+
+
+----------
