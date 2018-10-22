@@ -2,80 +2,81 @@
 #include "auxiliar.h"
 
 /*Verifica se o bit na posição id é 1*/
-int bit_is_true(int code, int id)
+int verifica_bit(int code, int id)
 {
     //Realiza o shift a esquerda do bit 0..01 em 'id' posições
     return code & (1 << id);
 }
 /*De acordo com tabela em https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.1-200-E.1*/
-void print_flags(int code, FILE* arq)
+void imprime_flags(int code, FILE* arq)
 {
 
     fprintf(arq, "[");
 
-    if (bit_is_true(code, 0))
+    if (verifica_bit(code, 0))
         fprintf(arq, "public ");
-    else if (bit_is_true(code, 1))
+    else if (verifica_bit(code, 1))
         fprintf(arq, "private ");
-    else if (bit_is_true(code, 2))
+    else if (verifica_bit(code, 2))
         fprintf(arq, "protected ");
-    if (bit_is_true(code, 3))
+    if (verifica_bit(code, 3))
         fprintf(arq, "static ");
-    if (bit_is_true(code, 4))
+    if (verifica_bit(code, 4))
         fprintf(arq, "final ");
-    if (bit_is_true(code, 5))
+    if (verifica_bit(code, 5))
         fprintf(arq, "super ");
-    if (bit_is_true(code, 6))
+    if (verifica_bit(code, 6))
         fprintf(arq, "volatile ");
-    if (bit_is_true(code, 7))
+    if (verifica_bit(code, 7))
         fprintf(arq, "transient ");
-    if (bit_is_true(code, 8))
+    if (verifica_bit(code, 8))
         fprintf(arq, "native ");
-    if (bit_is_true(code, 9))
+    if (verifica_bit(code, 9))
         fprintf(arq, "interface ");
-    if (bit_is_true(code, 10))
+    if (verifica_bit(code, 10))
         fprintf(arq, "abstract ");
 
     fprintf(arq, "]");
 }
 
-/*Print do CAFEBABE em hexa*/
-void print_func_magic(ClassFile* cf, FILE* arq)
+/*Imprime o CAFEBABE em hexa*/
+void imprime_magic_func(ClassFile* cf, FILE* arq)
 {
-    fprintf(arq, "-- MAGIC: %x\n", cf->magic);
+    fprintf(arq, "# MAGIC: %x\n", cf->magic);
 }
 
+
 /*Imprime os valores lidos pela função carrega_versoes em "leitor"*/
-void print_versions(ClassFile* cf, FILE* arq)
+void imprime_versions(ClassFile* cf, FILE* arq)
 {
-    fprintf(arq, "-- MINOR VERSION: %d\n", cf->minor_version);
-    char *version_jdk =  look_version(cf->major_version);
-    fprintf(arq, "MAJOR VERSION: %d - %s\n", cf->major_version, version_jdk);
+    fprintf(arq, "# MINOR VERSÃO: %d\n", cf->minor_version);
+    char *version_jdk =  descobre_versao(cf->major_version);
+    fprintf(arq, "# MAJOR VERSÃO: %d - %s\n", cf->major_version, version_jdk);
     free(version_jdk);
 
-    fprintf(arq, "-- CONSTANT POOL COUNT: %d\n", cf->constant_pool_count);
+    fprintf(arq, "# CONSTANTPOOL CONTAGEM: %d\n", cf->constant_pool_count);
 
-    fprintf(arq, "-- ACCESS_FLAGS: %x ", cf->access_flags);
-    print_flags(cf->access_flags, arq);
+    fprintf(arq, "# ACCESS_FLAGS: %x ", cf->access_flags);
+    imprime_flags(cf->access_flags, arq);
     fprintf(arq, "\n");
-    fprintf(arq, "-- THIS_CLASS: %d\n", cf->this_class);
-    fprintf(arq, "-- SUPER_CLASS: %d\n", cf->super_class);
+    fprintf(arq, "# THIS_CLASS: %d\n", cf->this_class);
+    fprintf(arq, "# SUPER_CLASS: %d\n", cf->super_class);
 
-    fprintf(arq, "-- INTERFACES_COUNT: %d\n", cf->interfaces_count);
-    fprintf(arq, "-- FIELDS_COUNT: %d\n", cf->fields_count);
-    fprintf(arq, "-- METHODS_COUNT: %d\n", cf->method_count);
-    fprintf(arq, "-- ATTRIBUTES_COUNT: %d\n\n", cf->attributes_count);
+    fprintf(arq, "# INTERFACES_CONTAGEM: %d\n", cf->interfaces_count);
+    fprintf(arq, "# FIELDS_CONTAGEM: %d\n", cf->fields_count);
+    fprintf(arq, "# METHODS_CONTAGEM: %d\n", cf->method_count);
+    fprintf(arq, "# ATTRIBUTES_CONTAGEM: %d\n\n", cf->attributes_count);
 
 }
 
 /*Imprime os valores referente a constant pool, as tags definidas na tabela
 foram definidos no exibidor.h */
-void print_constantpool(ClassFile* cf, FILE* arq)
+void imprime_pool_constantes(ClassFile* cf, FILE* arq)
 {
     int i = 1;
     long long Long;
-    fprintf(arq, "- CONSTANT POOL COUNT: %d\n", cf->constant_pool_count);
-    fprintf(arq, "- CONSTANT_POOL:\n");
+    fprintf(arq, "- CONSTANTPOOL CONTAGEM: %d\n", cf->constant_pool_count);
+    fprintf(arq, "- CONSTANTPOOL:\n");
     cp_info* cp;
     for (cp = cf->constant_pool; cp < cf->constant_pool + cf->constant_pool_count - 1; ++cp)
     {
@@ -83,72 +84,72 @@ void print_constantpool(ClassFile* cf, FILE* arq)
         switch (cp->tag)
         {
         case CLASS:
-            fprintf(arq, " ---CP_INFO: CLASS\n");
-            fprintf(arq, " ---NAME_INDEX: %d: %s\n", cp->info.Class_info.name_index, (char*)cf->constant_pool[cp->info.Class_info.name_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: CLASS\n");
+            fprintf(arq, " ## NAME_INDEX: %d: %s\n", cp->info.Class_info.name_index, (char*)cf->constant_pool[cp->info.Class_info.name_index - 1].info.Utf8_info.bytes);
             break;
         case FIELDREF:
-            fprintf(arq, " ---CP_INFO: FIELDREF\n");
-            fprintf(arq, " ---CLASS_INDEX: %d: %s\n", cp->info.Fieldref_info.class_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Fieldref_info.class_index - 1].info.Class_info.name_index - 1].info.Utf8_info.bytes);
-            fprintf(arq, " ---NAMEANDTYPE_INDEX: %d: %s%s\n", cp->info.Fieldref_info.name_and_type_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Fieldref_info.name_and_type_index - 1].info.NameAndType_info.name_index - 1].info.Utf8_info.bytes, (char*)cf->constant_pool[cf->constant_pool[cp->info.Fieldref_info.name_and_type_index - 1].info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: FIELDREF\n");
+            fprintf(arq, " ## CLASS_INDEX: %d: %s\n", cp->info.Fieldref_info.class_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Fieldref_info.class_index - 1].info.Class_info.name_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## NAMEANDTYPE_INDEX: %d: %s%s\n", cp->info.Fieldref_info.name_and_type_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Fieldref_info.name_and_type_index - 1].info.NameAndType_info.name_index - 1].info.Utf8_info.bytes, (char*)cf->constant_pool[cf->constant_pool[cp->info.Fieldref_info.name_and_type_index - 1].info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
             break;
         case METHOD:
-            fprintf(arq, " ---CP_INFO: METHOD\n");
-            fprintf(arq, " ---CLASS_INDEX: %d: %s\n", cp->info.Method_info.class_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Method_info.class_index - 1].info.Class_info.name_index - 1].info.Utf8_info.bytes);
-            fprintf(arq, " ---NAMEANDTYPE_INDEX: %d: %s%s\n", cp->info.Method_info.name_and_type_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Method_info.name_and_type_index - 1].info.NameAndType_info.name_index - 1].info.Utf8_info.bytes, (char*)cf->constant_pool[cf->constant_pool[cp->info.Method_info.name_and_type_index - 1].info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: METHOD\n");
+            fprintf(arq, " ## CLASS_INDEX: %d: %s\n", cp->info.Method_info.class_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Method_info.class_index - 1].info.Class_info.name_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## NAMEANDTYPE_INDEX: %d: %s%s\n", cp->info.Method_info.name_and_type_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Method_info.name_and_type_index - 1].info.NameAndType_info.name_index - 1].info.Utf8_info.bytes, (char*)cf->constant_pool[cf->constant_pool[cp->info.Method_info.name_and_type_index - 1].info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
             break;
         case INTERFACE:
-            fprintf(arq, " ---CP_INFO: INTERFACE\n");
-            fprintf(arq, " ---CLASS_INDEX: %d: %s\n", cp->info.Interface_info.class_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Interface_info.class_index - 1].info.Class_info.name_index - 1].info.Utf8_info.bytes);
-            fprintf(arq, " ---NAMEANDTYPE_INDEX: %d: %s%s\n", cp->info.Interface_info.name_and_type_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Interface_info.name_and_type_index - 1].info.NameAndType_info.name_index - 1].info.Utf8_info.bytes, (char*)cf->constant_pool[cf->constant_pool[cp->info.Interface_info.name_and_type_index - 1].info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: INTERFACE\n");
+            fprintf(arq, " ## CLASS_INDEX: %d: %s\n", cp->info.Interface_info.class_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Interface_info.class_index - 1].info.Class_info.name_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## NAMEANDTYPE_INDEX: %d: %s%s\n", cp->info.Interface_info.name_and_type_index, (char*)cf->constant_pool[cf->constant_pool[cp->info.Interface_info.name_and_type_index - 1].info.NameAndType_info.name_index - 1].info.Utf8_info.bytes, (char*)cf->constant_pool[cf->constant_pool[cp->info.Interface_info.name_and_type_index - 1].info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
             break;
         case NAMEANDTYPE:
-            fprintf(arq, " ---CP_INFO: NAMEANDTYPE\n");
-            fprintf(arq, " ---NAME_INDEX: %d: %s\n", cp->info.NameAndType_info.name_index, (char*)cf->constant_pool[cp->info.NameAndType_info.name_index - 1].info.Utf8_info.bytes);
-            fprintf(arq, " ---DESCRIPTOR_INDEX: %d: %s\n", cp->info.NameAndType_info.descriptor_index, (char*)cf->constant_pool[cp->info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: NAMEANDTYPE\n");
+            fprintf(arq, " ## NAME_INDEX: %d: %s\n", cp->info.NameAndType_info.name_index, (char*)cf->constant_pool[cp->info.NameAndType_info.name_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## DESCRIPTOR_INDEX: %d: %s\n", cp->info.NameAndType_info.descriptor_index, (char*)cf->constant_pool[cp->info.NameAndType_info.descriptor_index - 1].info.Utf8_info.bytes);
             break;
         case UTF8:
-            fprintf(arq, " ---CP_INFO: UTF8\n");
-            fprintf(arq, " ---LENGTH: %d\n", cp->info.Utf8_info.length);
-            fprintf(arq, " ---VALUE: %s\n", (char*)cp->info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: UTF8\n");
+            fprintf(arq, " ## LENGTH: %d\n", cp->info.Utf8_info.length);
+            fprintf(arq, " ## VALUE: %s\n", (char*)cp->info.Utf8_info.bytes);
             break;
         case STRING:
-            fprintf(arq, " ---CP_INFO: STRING\n");
-            fprintf(arq, " ---STRING_INDEX: %d: %s\n", cp->info.String_info.string_index, (char*)cf->constant_pool[cp->info.String_info.string_index - 1].info.Utf8_info.bytes);
+            fprintf(arq, " ## CP_INFO: STRING\n");
+            fprintf(arq, " ## STRING_INDEX: %d: %s\n", cp->info.String_info.string_index, (char*)cf->constant_pool[cp->info.String_info.string_index - 1].info.Utf8_info.bytes);
             break;
         case INTEGER:
-            fprintf(arq, " ---CP_INFO: INTEGER\n");
-            fprintf(arq, " ---BYTES: %x\n", cp->info.Integer_info.bytes);
-            fprintf(arq, " ---VALUE: %u\n", cp->info.Integer_info.bytes);
+            fprintf(arq, " ## CP_INFO: INTEGER\n");
+            fprintf(arq, " ## BYTES: %x\n", cp->info.Integer_info.bytes);
+            fprintf(arq, " ## VALUE: %u\n", cp->info.Integer_info.bytes);
             break;
         case FLOAT:
-            fprintf(arq, " ---CP_INFO: FLOAT\n");
-            fprintf(arq, " ---BYTES: %x\n", cp->info.Float_info.bytes);
+            fprintf(arq, " ## CP_INFO: FLOAT\n");
+            fprintf(arq, " ## BYTES: %x\n", cp->info.Float_info.bytes);
             u4tofloat.U4 = cp->info.Float_info.bytes;
-            fprintf(arq, " ---VALUE: %f\n", u4tofloat.Float);
+            fprintf(arq, " ## VALUE: %f\n", u4tofloat.Float);
             break;
         case LONG:
-            fprintf(arq, " ---CP_INFO: LONG\n");
-            fprintf(arq, " ---HIGH: %x\n", cp->info.Long_info.high_bytes);
-            fprintf(arq, " ---LOW: %x\n", cp->info.Long_info.low_bytes);
+            fprintf(arq, " ## CP_INFO: LONG\n");
+            fprintf(arq, " ## HIGH: %x\n", cp->info.Long_info.high_bytes);
+            fprintf(arq, " ## LOW: %x\n", cp->info.Long_info.low_bytes);
             Long = ((long long) cp->info.Long_info.high_bytes << 32) | (cp->info.Long_info.low_bytes);
-            fprintf(arq, " ---VALUE: %lld\n", Long);
+            fprintf(arq, " ## VALUE: %lld\n", Long);
             break;
         case DOUBLE:
-            fprintf(arq, " ---CP_INFO: DOUBLE\n");
-            fprintf(arq, " ---HIGH: %x\n", cp->info.Double_info.high_bytes);
-            fprintf(arq, " ---LOW: %x\n", cp->info.Double_info.low_bytes);
+            fprintf(arq, " ## CP_INFO: DOUBLE\n");
+            fprintf(arq, " ## HIGH: %x\n", cp->info.Double_info.high_bytes);
+            fprintf(arq, " ## LOW: %x\n", cp->info.Double_info.low_bytes);
             Long = ((long long) cp->info.Double_info.high_bytes << 32) | (cp->info.Double_info.low_bytes);
-            fprintf(arq, " ---VALUE: %lld\n", Long);
+            fprintf(arq, " ## VALUE: %lld\n", Long);
             break;
         }
     }
-
+ 
 }
 
-void print_classdata(ClassFile* cf, FILE* arq)
+void imprime_classdata(ClassFile* cf, FILE* arq)
 {
     fprintf(arq, "- ACCESS_FLAGS: %x ", cf->access_flags);
-    print_flags(cf->access_flags, arq);
+    imprime_flags(cf->access_flags, arq);
     fprintf(arq, "\n");
     fprintf(arq, "- THIS_CLASS: %d\n", cf->this_class);
     fprintf(arq, "\n");
@@ -158,16 +159,16 @@ void print_classdata(ClassFile* cf, FILE* arq)
 
 
 
-void print_interfaces(ClassFile* cf, FILE* arq)
+void imprime_interfaces(ClassFile* cf, FILE* arq)
 {
-    fprintf(arq, "INTERFACES_COUNT: %d\n", cf->interfaces_count);
+    fprintf(arq, "INTERFACES_CONTAGEM: %d\n", cf->interfaces_count);
     fprintf(arq, "\n");
     fprintf(arq, "INTERFACES:\n");
     fprintf(arq, "\n");
     uint16_t* interface_aux;
     for (interface_aux = cf->interfaces; interface_aux < cf->interfaces + cf->interfaces_count; ++interface_aux)
     {
-        fprintf(arq, " ---INTERFACE: %d\n\n", *interface_aux);
+        fprintf(arq, " ## INTERFACE: %d\n\n", *interface_aux);
     }
     if (!cf->interfaces_count)
     {
@@ -178,7 +179,7 @@ void print_interfaces(ClassFile* cf, FILE* arq)
 
 //TODO: Quebrar em mais funções
 /*Imprime um atributo de qualquer tipo*/
-void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
+void imprime_atributo(ClassFile* cf, attribute_info* att, FILE* arq)
 {
 
 //Comeca do 4, https://cs.au.dk/~mis/dOvs/jvmspec/ref-newarray.html
@@ -291,9 +292,9 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
         cp_info* cp;
         for (code = att->type.Code_attribute.code; code < att->type.Code_attribute.code + att->type.Code_attribute.code_length; ++code)
         {
-            fprintf(arq, "\t\t%d | ", (int) (code - (att->type.Code_attribute.code))); //printa a instrucao sem o codigo em hexa
+            fprintf(arq, "\t\t%d | ", (int) (code - (att->type.Code_attribute.code))); //imprime a instrucao sem o codigo em hexa
 
-            fprintf(arq, "%s ", instruction_name[*code]); //printa a instrucao
+            fprintf(arq, "%s ", instruction_name[*code]); //imprime a instrucao
             uint8_t u1_aux;
             uint16_t u2_aux;
             uint32_t u4_aux;
@@ -631,45 +632,45 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
 
             fprintf(arq, "\n");
         }
-        fprintf(arq, "--- EXCEPTION_TABLE_LENGTH: %d\n", att->type.Code_attribute.exception_table_length);
+        fprintf(arq, "##  EXCEPTION_TABLE_LENGTH: %d\n", att->type.Code_attribute.exception_table_length);
         exception_table_info* exp_aux;
         for (exp_aux = att->type.Code_attribute.exception_table; exp_aux < att->type.Code_attribute.exception_table + att->type.Code_attribute.exception_table_length; ++exp_aux)
         {
-            fprintf(arq, "--- EXCEPTION:\n");
-            fprintf(arq, "\t--- START_PC: %d\n", exp_aux->start_pc);
-            fprintf(arq, "\t--- END_PC: %d\n", exp_aux->end_pc);
-            fprintf(arq, "\t--- HANDLER_PC: %d\n", exp_aux->handler_pc);
-            fprintf(arq, "\t--- CATCH_TYPE: %d\n", exp_aux->catch_type);
+            fprintf(arq, "##  EXCEPTION:\n");
+            fprintf(arq, "\t##  START_PC: %d\n", exp_aux->start_pc);
+            fprintf(arq, "\t##  END_PC: %d\n", exp_aux->end_pc);
+            fprintf(arq, "\t##  HANDLER_PC: %d\n", exp_aux->handler_pc);
+            fprintf(arq, "\t##  CATCH_TYPE: %d\n", exp_aux->catch_type);
         }
-        fprintf(arq, "--- ATTRIBUTES_COUNT: %d\n", att->type.Code_attribute.attributes_count);
+        fprintf(arq, "##  ATRIBUTOS_CONTAGEM: %d\n", att->type.Code_attribute.attributes_count);
         attribute_info* aux_att;
         for (aux_att = att->type.Code_attribute.attributes; aux_att < att->type.Code_attribute.attributes + att->type.Code_attribute.attributes_count; ++aux_att)
         {
-            print_atribute(cf, aux_att, arq);
+            imprime_atributo(cf, aux_att, arq);
         }
         break;
     case EXCEPTIONS:
-        fprintf(arq, "--- TYPE: EXCEPTIONS\n");
-        fprintf(arq, "--- NUMBER_OF_EXCEPTIONS: %d\n", att->type.Exceptions.number_of_exceptions);
+        fprintf(arq, "##  TYPE: EXCEPTIONS\n");
+        fprintf(arq, "##  NUMBER_OF_EXCEPTIONS: %d\n", att->type.Exceptions.number_of_exceptions);
         uint16_t* expt_aux;
         for (expt_aux = att->type.Exceptions.exception_index_table; expt_aux < att->type.Exceptions.exception_index_table + att->type.Exceptions.number_of_exceptions; ++expt_aux)
         {
-            fprintf(arq, "--- EXCEPTION:\n");
-            fprintf(arq, "\t--- CLASS: %d\n", *expt_aux);
+            fprintf(arq, "##  EXCEPTION:\n");
+            fprintf(arq, "\t##  CLASS: %d\n", *expt_aux);
         }
         break;
     case INNERCLASSES:
-        fprintf(arq, "--- TYPE: INNER CLASSES:\n");
-        fprintf(arq, "--- NUMBER_OF_CLASSES: %d\n", att->type.InnerClasses.number_of_classes);
+        fprintf(arq, "##  TYPE: INNER CLASSES:\n");
+        fprintf(arq, "##  NUMBER_OF_CLASSES: %d\n", att->type.InnerClasses.number_of_classes);
         classtype_info* classtype_aux;
         for (classtype_aux = att->type.InnerClasses.classes; classtype_aux < att->type.InnerClasses.classes + att->type.InnerClasses.number_of_classes; ++classtype_aux)
         {
-            fprintf(arq, "--- INNER CLASS:\n");
-            fprintf(arq, "\t--- INNER CLASS: %d\n", classtype_aux->inner_class_info_index);
-            fprintf(arq, "\t--- OUTER CLASS: %d\n", classtype_aux->outer_class_info_index);
-            fprintf(arq, "\t--- INNER NAME: %d\n", classtype_aux->inner_name_index);
-            fprintf(arq, "\t--- INNER CLASS ACCESS FLAGS: %x ", classtype_aux->inner_class_access_flags);
-            print_flags(classtype_aux->inner_class_access_flags, arq);
+            fprintf(arq, "##  INNER CLASS:\n");
+            fprintf(arq, "\t##  INNER CLASS: %d\n", classtype_aux->inner_class_info_index);
+            fprintf(arq, "\t##  OUTER CLASS: %d\n", classtype_aux->outer_class_info_index);
+            fprintf(arq, "\t##  INNER NAME: %d\n", classtype_aux->inner_name_index);
+            fprintf(arq, "\t##  INNER CLASS ACCESS FLAGS: %x ", classtype_aux->inner_class_access_flags);
+            imprime_flags(classtype_aux->inner_class_access_flags, arq);
             fprintf(arq, "\n\n");
             fprintf(arq, "\n");
         }
@@ -680,18 +681,18 @@ void print_atribute(ClassFile* cf, attribute_info* att, FILE* arq)
     free(type);
 }
 
-void print_fields(ClassFile* cf, FILE* arq)
+void imprime_campos(ClassFile* cf, FILE* arq)
 {
     int var1 = 0;
     int var2 = 0;
 
-    fprintf(arq, "FIELDS_COUNT: %d\n", cf->fields_count);
+    fprintf(arq, "CAMPOS_CONTAGEM: %d\n", cf->fields_count);
     if (cf->fields_count == 0)
     {
         fprintf(arq, "\n");
         return;
     }
-    fprintf(arq, "FIELDS:\n");
+    fprintf(arq, "CAMPOS:\n");
     field_info* aux_field;
     for (aux_field = cf->fields; aux_field < cf->fields + cf->fields_count; ++aux_field)
     {
@@ -699,24 +700,24 @@ void print_fields(ClassFile* cf, FILE* arq)
         fprintf(arq, "\tNAME_INDEX: %d: %s\n", aux_field->name_index, (char*)cf->constant_pool[aux_field->name_index - 1].info.Utf8_info.bytes);
         fprintf(arq, "\tDESCRIPTOR_INDEX: %d: %s\n", aux_field->descriptor_index, (char*)cf->constant_pool[aux_field->descriptor_index - 1].info.Utf8_info.bytes);
         fprintf(arq, "\tACCESS_FLAGS: %x ", aux_field->access_flags);
-        print_flags(aux_field->access_flags, arq);
+        imprime_flags(aux_field->access_flags, arq);
         fprintf(arq, "\n");
-        fprintf(arq, "\tATTRIBUTE_COUNT: %d\n\n", aux_field->attributes_count);
+        fprintf(arq, "\tATRIBUTOS_CONTAGEM: %d\n\n", aux_field->attributes_count);
         attribute_info* aux_att;
         for (aux_att = aux_field->attributes; aux_att < aux_field->attributes + aux_field->attributes_count; ++aux_att)
         {
             fprintf(arq, "[%d] FIELD_ATTRIBUTE:\n", var2++);
-            print_atribute(cf, aux_att, arq);
+            imprime_atributo(cf, aux_att, arq);
         }
     }
 }
 
-void print_methodes(ClassFile* cf, FILE* arq)
+void imprime_metodos(ClassFile* cf, FILE* arq)
 {
     int var1 = 0;
     int var2 = 0;
 
-    fprintf(arq, "METHODS_COUNT: %d\n", cf->method_count); // número de estruturas na tabela methods
+    fprintf(arq, "METHODS_CONTAGEM: %d\n", cf->method_count); // número de estruturas na tabela methods
     if (cf->method_count == 0)
     {
         fprintf(arq, "\n");
@@ -727,26 +728,26 @@ void print_methodes(ClassFile* cf, FILE* arq)
     for (aux_meth = cf->methods; aux_meth < cf->methods + cf->method_count; ++aux_meth)
     {
         fprintf(arq, "[%d]\n", var1++);
-        fprintf(arq, "--- NAME_INDEX: %d: %s\n", aux_meth->name_index, (char*)cf->constant_pool[aux_meth->name_index - 1].info.Utf8_info.bytes);
-        fprintf(arq, "--- DESCRIPTOR_INDEX: %d: %s\n", aux_meth->descriptor_index, (char*)cf->constant_pool[aux_meth->descriptor_index - 1].info.Utf8_info.bytes);
-        fprintf(arq, "--- ACCESS_FLAGS: %x ", aux_meth->access_flags);
-        print_flags(aux_meth->access_flags, arq);
+        fprintf(arq, "##  NAME_INDEX: %d: %s\n", aux_meth->name_index, (char*)cf->constant_pool[aux_meth->name_index - 1].info.Utf8_info.bytes);
+        fprintf(arq, "##  DESCRIPTOR_INDEX: %d: %s\n", aux_meth->descriptor_index, (char*)cf->constant_pool[aux_meth->descriptor_index - 1].info.Utf8_info.bytes);
+        fprintf(arq, "##  ACCESS_FLAGS: %x ", aux_meth->access_flags);
+        imprime_flags(aux_meth->access_flags, arq);
         fprintf(arq, "\n");
-        fprintf(arq, "--- ATTRIBUTE_COUNT: %d\n", aux_meth->attributes_count);
+        fprintf(arq, "##  ATRIBUTOS_CONTAGEM: %d\n", aux_meth->attributes_count);
         attribute_info* aux_att;
         for (aux_att = aux_meth->attributes; aux_att < aux_meth->attributes + aux_meth->attributes_count; ++aux_att)
         {
-            fprintf(arq, "--- [%d] METHOD_ATTRIBUTE:\n", var2++);
-            print_atribute(cf, aux_att, arq);
+            fprintf(arq, "##  [%d] METHOD_ATTRIBUTE:\n", var2++);
+            imprime_atributo(cf, aux_att, arq);
         }
     }
 }
 
 
-void print_atributes(ClassFile* cf, FILE* arq)
+void imprime_atributos(ClassFile* cf, FILE* arq)
 {
     int att_itera = 0;
-    fprintf(arq, "ATTRIBUTES_COUNT: %d\n", cf->attributes_count);
+    fprintf(arq, "ATTRIBUTES_CONTAGEM: %d\n", cf->attributes_count);
     if (cf->attributes_count == 0)
     {
         fprintf(arq, "\n");
@@ -757,7 +758,7 @@ void print_atributes(ClassFile* cf, FILE* arq)
     for (aux_att = cf->attributes; aux_att < cf->attributes + cf->attributes_count; ++aux_att)
     {
         fprintf(arq, "[%d] ATTRIBUTE:\n", att_itera++);
-        print_atribute(cf, aux_att, arq);
+        imprime_atributo(cf, aux_att, arq);
     }
 }
 
@@ -765,79 +766,79 @@ void print_atributes(ClassFile* cf, FILE* arq)
 void print(ClassFile* cf, char* filename_in, FILE* arq)
 {
     fprintf(arq, "Nome do arquivo: %s\n\n", filename_in);
-    fprintf(arq, "\n");
-    print_func_magic(cf, arq);
-    fprintf(arq, "\n");
-    print_versions(cf, arq);
-    fprintf(arq, "\n");
-    print_constantpool(cf, arq);
-    fprintf(arq, "\n");
-    print_interfaces(cf, arq);
-    fprintf(arq, "\n");
-    print_fields(cf, arq);
-    fprintf(arq, "\n");
-    print_methodes(cf, arq);
-    fprintf(arq, "\n");
-    print_atributes(cf, arq);
-    fprintf(arq, "\n");
+    fprintf(arq, "\n----------\n");
+    imprime_magic_func(cf, arq);
+    fprintf(arq, "\n----------\n");
+    imprime_versions(cf, arq);
+    fprintf(arq, "\n----------\n");
+    imprime_pool_constantes(cf, arq);
+    fprintf(arq, "\n----------\n");
+    imprime_interfaces(cf, arq);
+    fprintf(arq, "\n----------\n");
+    imprime_campos(cf, arq);
+    fprintf(arq, "\n----------\n");
+    imprime_metodos(cf, arq);
+    fprintf(arq, "\n----------\n");
+    imprime_atributos(cf, arq);
+    fprintf(arq, "\n----------\n");
 
     printf("Exibicao concluida!\n");
 }
 
-/*A lista utilizada para identificação das major versions pode ser acessada nesse link
+/*A lista utilizada para identificação das major versions pode ser acessada nessa url:
 https://en.wikipedia.org/wiki/Java_class_file#General_layout
 */
 
-char* look_version(int code)
+char* descobre_versao(int codigo)
 {
 
-    char* version_jdk;
-    switch (code)
+    char* versao_jdk;
+    switch (codigo)
     {
     case 45:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.1");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.1");
         break;
     case 46:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.2");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.2");
         break;
     case 47:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.3");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.3");
         break;
     case 48:
-        version_jdk = (char*) malloc(sizeof(char) * 8);
-        strcpy(version_jdk, "JDK 1.4");
+        versao_jdk = (char*) malloc(sizeof(char) * 8);
+        strcpy(versao_jdk, "JDK 1.4");
         break;
     case 49:
-        version_jdk = (char*) malloc(sizeof(char) * 12);
-        strcpy(version_jdk, "Java SE 5.0");
+        versao_jdk = (char*) malloc(sizeof(char) * 12);
+        strcpy(versao_jdk, "Java SE 5.0");
         break;
     case 50:
-        version_jdk = (char*) malloc(sizeof(char) * 12);
-        strcpy(version_jdk, "Java SE 6.0");
+        versao_jdk = (char*) malloc(sizeof(char) * 12);
+        strcpy(versao_jdk, "Java SE 6.0");
         break;
     case 51:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 7");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 7");
         break;
     case 52:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 8");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 8");
         break;
     case 53:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 9");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 9");
         break;
     case 54:
-        version_jdk = (char*) malloc(sizeof(char) * 10);
-        strcpy(version_jdk, "Java SE 10");
+        versao_jdk = (char*) malloc(sizeof(char) * 10);
+        strcpy(versao_jdk, "Java SE 10");
         break;
     default:
-        version_jdk = (char*) malloc(sizeof(char) * 21);
-        strcpy(version_jdk, "Java desconhecido");
+        versao_jdk = (char*) malloc(sizeof(char) * 21);
+        strcpy(versao_jdk, "Java desconhecido");
         break;
     }
-    return version_jdk;
+    return versao_jdk;
 }
