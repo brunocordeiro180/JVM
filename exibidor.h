@@ -24,3 +24,4 @@ void imprime_atributos(ClassFile* cf,FILE* arq);
 void print(ClassFile* cf,char* namefile,FILE* arq);
 char* descobre_versao(int code);
 #endif
+

@@ -15,7 +15,7 @@ void load_java_versions(ClassFile* cf, FILE* fd)
 }
 
 /*Leitura da constant pool*/
-void load_constantpool(ClassFile* cf, FILE* fd)
+void carrega_constant_pool(ClassFile* cf, FILE* fd)
 {
     cf->constant_pool_count = leU16(fd);
     if (cf->constant_pool_count <= 1)
@@ -84,14 +84,14 @@ void load_constantpool(ClassFile* cf, FILE* fd)
     }
 }
 
-void load_class(ClassFile* cf, FILE* fd)
+void carrega_class(ClassFile* cf, FILE* fd)
 {
     cf->access_flags = leU16(fd);
     cf->this_class = leU16(fd);
     cf->super_class = leU16(fd);
 }
 
-void load_interfaces(ClassFile* cf, FILE* fd)
+void carrega_interfaces(ClassFile* cf, FILE* fd)
 {
     cf->interfaces_count = leU16(fd);
     if (!cf->interfaces_count)
@@ -109,14 +109,14 @@ void load_interfaces(ClassFile* cf, FILE* fd)
 
 /*Carrega o indice da constante que deve ser de acordo com a tabela:
 https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.2-300-C.1*/
-void load_constantvalue_attribute(attribute_info* att, FILE* fd)
+void carrega_attribute_constant_value(attribute_info* att, FILE* fd)
 {
     att->type.ConstantValue.constantvalue_index = leU16(fd);
 }
 
 /*Carrega atributo code, que possui três tabelas de acordo com a tabela:
 https://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.7.2-300-C.1*/
-void load_code_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
+void carrega_attribute_code(attribute_info* att, ClassFile* cf, FILE* fd)
 {
     att->type.Code_attribute.max_stack = leU16(fd);
     att->type.Code_attribute.max_locals = leU16(fd);
@@ -162,13 +162,13 @@ void load_code_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
         attribute_info* att_aux;
         for (att_aux = att->type.Code_attribute.attributes; att_aux < att->type.Code_attribute.attributes + att->type.Code_attribute.attributes_count; ++att_aux)
         {
-            load_attribute(att_aux, cf, fd);
+            carregaAtributoEspecif(att_aux, cf, fd);
         }
     }
 }
 /*Carrega os atributos exception*/
 /*Usada pela tabela attributes de method_info*/
-void load_exception_attribute(attribute_info* att, FILE* fd)
+void carrega_attribute_exception(attribute_info* att, FILE* fd)
 {
     att->type.Exceptions.number_of_exceptions = leU16(fd);
     if (att->type.Exceptions.number_of_exceptions == 0)
@@ -188,7 +188,7 @@ void load_exception_attribute(attribute_info* att, FILE* fd)
 
 /*Carrega o atributo InnerClasses*/
 /*Usada pela tabela de atributos de ClassFile*/
-void load_innerclasses_attribute(attribute_info* att, FILE* fd)
+void carregaAtributoInnerClasses(attribute_info* att, FILE* fd)
 {
     att->type.InnerClasses.number_of_classes = leU16(fd);
     if (att->type.InnerClasses.number_of_classes == 0)
@@ -207,7 +207,7 @@ void load_innerclasses_attribute(attribute_info* att, FILE* fd)
     }
 }
 
-void load_other_attribute(attribute_info* att, FILE* fd)
+void carregaAtributo(attribute_info* att, FILE* fd)
 {
     if (!att->attribute_length)
     {
@@ -223,7 +223,7 @@ void load_other_attribute(attribute_info* att, FILE* fd)
 }
 /*Determina qual o tipo de attribute a ser lido e chama a função apropriada*/
 /*Pode ser chamado para ler atributo do ClassFile, Method_info ou Field_info*/
-void load_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
+void carregaAtributoEspecif(attribute_info* att, ClassFile* cf, FILE* fd)
 {
     char* type;
     att->attribute_name_index = leU16(fd);
@@ -234,25 +234,25 @@ void load_attribute(attribute_info* att, ClassFile* cf, FILE* fd)
     switch (typeInt)
     {
     case CONSTANTVALUE:
-        load_constantvalue_attribute(att, fd);
+        carrega_attribute_constant_value(att, fd);
         break;
     case CODE:
-        load_code_attribute(att, cf, fd);
+        carrega_attribute_code(att, cf, fd);
         break;
     case EXCEPTIONS:
-        load_exception_attribute(att, fd);
+        carrega_attribute_exception(att, fd);
         break;
     case INNERCLASSES:
-        load_innerclasses_attribute(att, fd);
+        carregaAtributoInnerClasses(att, fd);
         break;
     case OTHER:
-        load_other_attribute(att, fd);
+        carregaAtributo(att, fd);
         break;
     }
     free(type);
 }
 
-void load_fields(ClassFile* cf, FILE* fd)
+void carregaCampos(ClassFile* cf, FILE* fd)
 {
 // carrega os fields. Dois campos na mesma classe não podem ter o mesmo nome.
 
@@ -275,12 +275,12 @@ void load_fields(ClassFile* cf, FILE* fd)
         attribute_info* aux_attribute;
         for (aux_attribute = aux_field->attributes; aux_attribute < aux_field->attributes + aux_field->attributes_count; ++aux_attribute)
         {
-            load_attribute(aux_attribute, cf, fd);
+            carregaAtributoEspecif(aux_attribute, cf, fd);
         }
     }
 }
 
-void load_methods(ClassFile* cf, FILE* fd)
+void carregaMetodos(ClassFile* cf, FILE* fd)
 {
     // carrega os métodos
     cf->method_count = leU16(fd);
@@ -301,12 +301,12 @@ void load_methods(ClassFile* cf, FILE* fd)
         attribute_info* att_aux;
         for (att_aux = aux_method->attributes; att_aux < aux_method->attributes + aux_method->attributes_count; ++att_aux)
         {
-            load_attribute(att_aux, cf, fd);
+            carregaAtributoEspecif(att_aux, cf, fd);
         }
     }
 }
 
-void load_attributes(ClassFile* cf, FILE* fd)
+void carregaAtributos(ClassFile* cf, FILE* fd)
 {
     cf->attributes_count = leU16(fd);
     if (cf->attributes_count == 0)
@@ -318,7 +318,7 @@ void load_attributes(ClassFile* cf, FILE* fd)
     attribute_info* att_aux;
     for (att_aux = cf->attributes; att_aux < cf->attributes + cf->attributes_count; ++att_aux)
     {
-        load_attribute(att_aux, cf, fd);
+        carregaAtributoEspecif(att_aux, cf, fd);
     }
 }
 
@@ -329,10 +329,10 @@ void load(FILE* fd, ClassFile** classfile)
 
     load_func_magic(*classfile, fd);
     load_java_versions(*classfile, fd);
-    load_constantpool(*classfile, fd);
-    load_class(*classfile, fd);
-    load_interfaces(*classfile, fd);
-    load_fields(*classfile, fd);
-    load_methods(*classfile, fd);
-    load_attributes(*classfile, fd);
+    carrega_constant_pool(*classfile, fd);
+    carrega_class(*classfile, fd);
+    carrega_interfaces(*classfile, fd);
+    carregaCampos(*classfile, fd);
+    carregaMetodos(*classfile, fd);
+    carregaAtributos(*classfile, fd);
 }

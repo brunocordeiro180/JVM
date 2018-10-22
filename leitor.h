@@ -1,29 +1,45 @@
 #include <stdio.h>
-#include <stdint.h>
-#include <inttypes.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+#include <stdint.h>
 
 #ifndef LEITOR_H
 #define LEITOR_H
 
 #define CONTINUED 0
+#define CODE 1
+#define UTF8 1
+#define EXCEPTIONS 2
+#define INNERCLASSES 3
+#define INTEGER 3
+#define FLOAT 4
+#define OTHER 4
+#define CONSTANTVALUE 5
+#define LONG 5
+#define DOUBLE 6
 #define CLASS 7
+#define STRING 8
 #define FIELDREF 9
 #define METHOD 10
 #define INTERFACE 11
 #define NAMEANDTYPE 12
-#define UTF8 1
-#define STRING 8
-#define INTEGER 3
-#define FLOAT 4
-#define LONG 5
-#define DOUBLE 6
-#define CONSTANTVALUE 5
-#define CODE 1
-#define EXCEPTIONS 2
-#define INNERCLASSES 3
-#define OTHER 4
+
+typedef struct
+{
+    uint16_t  inner_class_info_index;
+    uint16_t  outer_class_info_index;
+    uint16_t  inner_name_index;
+    uint16_t  inner_class_access_flags;
+} classtype_info;
+
+typedef struct
+{
+    uint16_t  start_pc;
+    uint16_t  end_pc;
+    uint16_t  handler_pc;
+    uint16_t  catch_type;
+} exception_table_info;
 
 union
 {
@@ -36,26 +52,6 @@ union
     long Long;
     double Double;
 } longtodouble;
-
-
-
-typedef struct
-{
-    uint16_t  inner_class_info_index;
-    uint16_t  outer_class_info_index;
-    uint16_t  inner_name_index;
-    uint16_t  inner_class_access_flags;
-} classtype_info;
-
-
-typedef struct
-{
-    uint16_t  start_pc;
-    uint16_t  end_pc;
-    uint16_t  handler_pc;
-    uint16_t  catch_type;
-} exception_table_info;
-
 
 typedef struct _attribute_info
 {
@@ -95,8 +91,6 @@ typedef struct _attribute_info
     } type;
 } attribute_info;
 
-
-
 typedef struct
 {
     uint16_t              access_flags;
@@ -105,7 +99,6 @@ typedef struct
     uint16_t              attributes_count;
     attribute_info* attributes;
 }   field_info, method_info;
-
 
 typedef struct
 {
@@ -151,8 +144,6 @@ typedef struct
     } info;
 } cp_info;
 
-
-
 typedef struct
 {
     uint32_t              magic;
@@ -173,19 +164,19 @@ typedef struct
     attribute_info* attributes;
 } ClassFile;
 
-void load_magic(ClassFile* classfile,FILE* fd);
-void load_versions(ClassFile* classfile,FILE* fd);
-void load_constantpool(ClassFile* classfile,FILE* fd);
-void load_class(ClassFile* classfile,FILE* fd);
-void load_interfaces(ClassFile* classfile,FILE* fd);
-void load_constantvalue_attribute(attribute_info* att, FILE* fd);
-void load_code_attribute(attribute_info* att, ClassFile* classfile,FILE* fd);
-void load_exception_attribute(attribute_info* att,FILE* fd);
-void load_innerclasses_attribute(attribute_info* att,FILE* fd);
-void load_other_attribute(attribute_info* att, FILE* fd);
-void load_fields(ClassFile* classfile,FILE* fd);
-void load_attributes(ClassFile* classfile, FILE* fd);
-void load_methods(ClassFile* classfile,FILE* fd);
-void load_attribute(attribute_info* att,ClassFile* classfile,FILE* fd);
+void carrega_versoes(ClassFile* classfile,FILE* fd);
+void carrega_constant_pool(ClassFile* classfile,FILE* fd);
+void carregaMetodos(ClassFile* classfile,FILE* fd);
+void carregaAtributoEspecif(attribute_info* att,ClassFile* classfile,FILE* fd);
+void carrega_class(ClassFile* classfile,FILE* fd);
+void carrega_interfaces(ClassFile* classfile,FILE* fd);
+void carregaAtributo(attribute_info* att, FILE* fd);
+void carregaCampos(ClassFile* classfile,FILE* fd);
+void carregaAtributos(ClassFile* classfile, FILE* fd);
+void carrega_attribute_constant_value(attribute_info* att, FILE* fd);
+void carregaAtributoInnerClasses(attribute_info* att,FILE* fd);
+void carrega_attribute_code(attribute_info* att, ClassFile* classfile,FILE* fd);
+void carrega_attribute_exception(attribute_info* att,FILE* fd);
 void load(FILE* fd, ClassFile** classfile);
+
 #endif
